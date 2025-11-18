@@ -4,6 +4,9 @@ const BASE_URL = 'https://api.themoviedb.org/3';
 const IMAGE_URL = 'https://image.tmdb.org/t/p/w500';
 const BACKDROP_URL = 'https://image.tmdb.org/t/p/w780';
 
+// YouTube video ID validation regex (11 characters, alphanumeric with _ and -)
+const YOUTUBE_VIDEO_ID_REGEX = /^[a-zA-Z0-9_-]{11}$/;
+
 // DOM Elements
 const trendingContainer = document.getElementById('trending-container');
 const popularContainer = document.getElementById('popular-container');
@@ -246,6 +249,50 @@ async function searchMovies(query) {
         }
     } catch (error) {
         console.error('Error searching movies:', error);
+        showError();
+    }
+}
+
+/**
+ * Search movies by keyword
+ */
+async function searchMoviesByKeyword(keywordId, keywordName) {
+    const url = `${BASE_URL}/discover/movie?language=es-ES&with_keywords=${keywordId}&sort_by=popularity.desc&page=1`;
+    
+    try {
+        showLoading();
+        const res = await fetch(url, options);
+        
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        
+        const data = await res.json();
+        
+        if (data.results && data.results.length > 0) {
+            displayMovies(data.results, trendingContainer);
+            hideLoading();
+            
+            // Update section title to show keyword search (using textContent is safe)
+            const trendingTitle = document.getElementById('trending-title');
+            if (trendingTitle) {
+                trendingTitle.textContent = `Películas con la palabra clave: "${keywordName}"`;
+            }
+            
+            // Scroll to results
+            trendingContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } else {
+            hideLoading();
+            // Clear container consistently using replaceChildren
+            const noResultsDiv = document.createElement('p');
+            noResultsDiv.className = 'text-center';
+            noResultsDiv.style.padding = '40px';
+            noResultsDiv.style.color = 'var(--text-secondary)';
+            noResultsDiv.textContent = `No se encontraron películas con la palabra clave "${keywordName}".`;
+            trendingContainer.replaceChildren(noResultsDiv);
+        }
+    } catch (error) {
+        console.error('Error searching movies by keyword:', error);
         showError();
     }
 }
@@ -533,6 +580,21 @@ function displayMovieDetails(data) {
     const screenplay = credits.crew.filter(person => person.job === 'Screenplay').slice(0, 2);
     const story = credits.crew.filter(person => person.job === 'Story').slice(0, 2);
     
+    // Get trailer video (prefer YouTube trailers and teasers)
+    let trailerKey = null;
+    if (videos.results && videos.results.length > 0) {
+        // Find YouTube video, prioritizing trailers and teasers
+        const youtubeVideos = videos.results.filter(video => video.site === 'YouTube');
+        const trailer = youtubeVideos.find(video => 
+            video.type === 'Trailer' || video.type === 'Teaser'
+        ) || youtubeVideos[0];
+        
+        // Validate trailerKey with regex to ensure it's safe for URL embedding
+        if (trailer && trailer.key && YOUTUBE_VIDEO_ID_REGEX.test(trailer.key)) {
+            trailerKey = trailer.key;
+        }
+    }
+    
     // Build HTML
     let html = `
         <div class="movie-detail-header" style="background-image: url('${details.backdrop_path ? BACKDROP_URL + details.backdrop_path : ''}');">
@@ -592,6 +654,25 @@ function displayMovieDetails(data) {
         </div>
         
         <div class="movie-detail-body">
+            <!-- Trailer Section -->
+            <!-- trailerKey is safe to use here as it's validated with YOUTUBE_VIDEO_ID_REGEX -->
+            ${trailerKey ? `
+                <div class="detail-section">
+                    <h2>Tráiler</h2>
+                    <div class="trailer-player">
+                        <iframe
+                            width="100%"
+                            height="500"
+                            src="https://www.youtube.com/embed/${trailerKey}"
+                            title="YouTube video player"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen
+                            style="border-radius: 8px;">
+                        </iframe>
+                    </div>
+                </div>
+            ` : ''}
+            
             <!-- Cast Section -->
             <div class="detail-section">
                 <h2>Reparto principal</h2>
@@ -700,11 +781,7 @@ function displayMovieDetails(data) {
             ${keywords.keywords.length > 0 ? `
                 <div class="detail-section">
                     <h2>Palabras clave</h2>
-                    <div class="keywords-list">
-                        ${keywords.keywords.map(keyword => `
-                            <span class="keyword-badge">${keyword.name}</span>
-                        `).join('')}
-                    </div>
+                    <div class="keywords-list" id="keywords-list-container"></div>
                 </div>
             ` : ''}
         </div>
@@ -712,12 +789,38 @@ function displayMovieDetails(data) {
     
     movieDetailContainer.innerHTML = html;
     
+    // Populate keywords using safe DOM methods
+    if (keywords.keywords.length > 0) {
+        const keywordsListContainer = movieDetailContainer.querySelector('#keywords-list-container');
+        if (keywordsListContainer) {
+            keywords.keywords.forEach(keyword => {
+                const badge = document.createElement('span');
+                badge.className = 'keyword-badge';
+                badge.setAttribute('data-keyword-id', keyword.id);
+                badge.setAttribute('data-keyword-name', keyword.name);
+                badge.textContent = keyword.name;
+                keywordsListContainer.appendChild(badge);
+            });
+        }
+    }
+    
     // Add click events to recommendation cards
     const recommendationCards = movieDetailContainer.querySelectorAll('.recommendation-card');
     recommendationCards.forEach(card => {
         card.addEventListener('click', () => {
             const movieId = card.getAttribute('data-movie-id');
             openMovieDetails(movieId);
+        });
+    });
+    
+    // Add click events to keyword badges
+    const keywordBadges = movieDetailContainer.querySelectorAll('.keyword-badge');
+    keywordBadges.forEach(badge => {
+        badge.addEventListener('click', () => {
+            const keywordId = badge.getAttribute('data-keyword-id');
+            const keywordName = badge.getAttribute('data-keyword-name');
+            searchMoviesByKeyword(keywordId, keywordName);
+            closeMovieDetails();
         });
     });
 }
