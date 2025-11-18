@@ -1430,12 +1430,14 @@ main {
     font-size: 0.85rem;
     color: var(--text-primary);
     transition: all var(--transition-speed);
+    cursor: pointer;
 }
 
 .keyword-badge:hover {
     background-color: var(--tmdb-light-blue);
     color: var(--tmdb-white);
-    cursor: pointer;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
 }
 
 /* Additional Info Section */
@@ -1499,4 +1501,26 @@ main {
     .cast-image {
         height: 150px;
     }
+    
+    .trailer-player iframe {
+        height: 250px;
+    }
 }
+
+/* Trailer Player Section */
+.trailer-player {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+}
+
+.trailer-player iframe {
+    width: 100%;
+    height: 500px;
+    border: none;
+    border-radius: 8px;
+}
+
