@@ -3,59 +3,219 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TMDB Clone - Inicio</title>
+    <meta name="description" content="Descubre millones de películas, series y más. La mejor base de datos de películas y series online.">
+    <meta name="keywords" content="películas, series, TMDB, cine, entretenimiento">
+    <title>TMDB - Películas, Series y Más | Base de Datos de Entretenimiento</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
-    <nav class="navbar">
+    <nav class="navbar" role="navigation" aria-label="Navegación principal">
         <div class="nav-wrapper">
             <div class="nav-left">
-                <a href="#" class="nav-logo">TMDB</a>
+                <a href="index.html" class="nav-logo" aria-label="TMDB Inicio">TMDB</a>
                 <ul class="nav-links">
-                    <li><a href="#">Películas</a></li>
-                    <li><a href="#">Series</a></li>
-                    <li><a href="#">Gente</a></li>
-                    <li><a href="#">Más</a></li>
+                    <li><a href="#" class="nav-link">Películas</a></li>
+                    <li><a href="#" class="nav-link">Series</a></li>
+                    <li><a href="#" class="nav-link">Gente</a></li>
+                    <li><a href="#" class="nav-link">Más</a></li>
                 </ul>
             </div>
             <div class="nav-right">
-                <i class="fas fa-plus"></i>
-                <div class="lang-box">ES</div>
-                <a href="#">Iniciar sesión</a>
-                <a href="#">Únete a TMDB</a>
-                <i class="fas fa-search search-icon-nav"></i>
+                <button class="icon-btn" aria-label="Añadir"><i class="fas fa-plus"></i></button>
+                <div class="lang-box" role="button" tabindex="0" aria-label="Cambiar idioma">ES</div>
+                <a href="#" class="nav-link">Iniciar sesión</a>
+                <a href="#" class="nav-link btn-join">Únete a TMDB</a>
+                <button class="icon-btn search-icon-nav" aria-label="Buscar"><i class="fas fa-search"></i></button>
             </div>
         </div>
     </nav>
 
-    <section class="hero">
+    <header class="hero" role="banner">
         <div class="hero-content">
             <h1>Te damos la bienvenida.</h1>
-            <h3>Millones de películas, series y gente por descubrir. Explora ya.</h3>
+            <p class="hero-subtitle">Millones de películas, series y gente por descubrir. Explora ya.</p>
             
             <div class="search-box">
-                <form id="search-form">
-                    <input type="text" id="search-input" placeholder="Buscar una película, serie, persona......">
-                    <button type="submit">Buscar</button>
+                <form id="search-form" role="search">
+                    <input 
+                        type="search" 
+                        id="search-input" 
+                        placeholder="Buscar una película, serie, persona......"
+                        aria-label="Buscar películas, series o personas"
+                        autocomplete="off">
+                    <button type="submit" aria-label="Buscar">Buscar</button>
                 </form>
             </div>
         </div>
-    </section>
+    </header>
 
-    <section class="trending-section">
-        <div class="section-header">
-            <h2>Tendencias</h2>
-            <div class="toggle-selector">
-                <div class="toggle-item active">Hoy</div>
-                <div class="toggle-item">Esta semana</div>
+    <main>
+        <section class="trending-section" aria-labelledby="trending-title">
+            <div class="section-header">
+                <h2 id="trending-title">Tendencias</h2>
+                <div class="toggle-selector" role="tablist" aria-label="Filtro de tendencias">
+                    <button 
+                        class="toggle-item active" 
+                        data-time="day" 
+                        role="tab" 
+                        aria-selected="true"
+                        aria-controls="trending-container">
+                        Hoy
+                    </button>
+                    <button 
+                        class="toggle-item" 
+                        data-time="week" 
+                        role="tab" 
+                        aria-selected="false"
+                        aria-controls="trending-container">
+                        Esta semana
+                    </button>
+                </div>
+            </div>
+
+            <div class="scroller-wrapper">
+                <div id="trending-container" class="scroller" role="tabpanel"></div>
+                <div id="loading-spinner" class="loading-spinner">
+                    <div class="spinner"></div>
+                    <p>Cargando películas...</p>
+                </div>
+                <div id="error-message" class="error-message" style="display: none;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>No se pudieron cargar las películas. Por favor, inténtalo de nuevo.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="popular-section" aria-labelledby="popular-title">
+            <div class="section-header">
+                <h2 id="popular-title">Populares</h2>
+                <div class="toggle-selector" role="tablist" aria-label="Filtro de populares">
+                    <button 
+                        class="toggle-item active" 
+                        data-category="streaming" 
+                        role="tab" 
+                        aria-selected="true"
+                        aria-controls="popular-container">
+                        Streaming
+                    </button>
+                    <button 
+                        class="toggle-item" 
+                        data-category="tv" 
+                        role="tab" 
+                        aria-selected="false"
+                        aria-controls="popular-container">
+                        En TV
+                    </button>
+                    <button 
+                        class="toggle-item" 
+                        data-category="rent" 
+                        role="tab" 
+                        aria-selected="false"
+                        aria-controls="popular-container">
+                        En Alquiler
+                    </button>
+                    <button 
+                        class="toggle-item" 
+                        data-category="theaters" 
+                        role="tab" 
+                        aria-selected="false"
+                        aria-controls="popular-container">
+                        En Cines
+                    </button>
+                </div>
+            </div>
+
+            <div class="scroller-wrapper">
+                <div id="popular-container" class="scroller" role="tabpanel"></div>
+            </div>
+        </section>
+
+        <section class="latest-trailers-section" aria-labelledby="trailers-title">
+            <div class="section-header">
+                <h2 id="trailers-title">Últimos Tráilers</h2>
+                <div class="toggle-selector" role="tablist" aria-label="Filtro de tráilers">
+                    <button 
+                        class="toggle-item active" 
+                        data-trailer="streaming" 
+                        role="tab" 
+                        aria-selected="true"
+                        aria-controls="trailers-container">
+                        Streaming
+                    </button>
+                    <button 
+                        class="toggle-item" 
+                        data-trailer="tv" 
+                        role="tab" 
+                        aria-selected="false"
+                        aria-controls="trailers-container">
+                        En TV
+                    </button>
+                    <button 
+                        class="toggle-item" 
+                        data-trailer="rent" 
+                        role="tab" 
+                        aria-selected="false"
+                        aria-controls="trailers-container">
+                        En Alquiler
+                    </button>
+                    <button 
+                        class="toggle-item" 
+                        data-trailer="theaters" 
+                        role="tab" 
+                        aria-selected="false"
+                        aria-controls="trailers-container">
+                        En Cines
+                    </button>
+                </div>
+            </div>
+
+            <div class="scroller-wrapper">
+                <div id="trailers-container" class="trailers-scroller" role="tabpanel"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer" role="contentinfo">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>TMDB</h3>
+                <ul>
+                    <li><a href="#">Acerca de TMDB</a></li>
+                    <li><a href="#">Contactar con el soporte</a></li>
+                    <li><a href="#">API</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Participa</h3>
+                <ul>
+                    <li><a href="#">Foros de discusión</a></li>
+                    <li><a href="#">Contribuir</a></li>
+                    <li><a href="#">Guía de contribución</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Comunidad</h3>
+                <ul>
+                    <li><a href="#">Directrices</a></li>
+                    <li><a href="#">Twitter</a></li>
+                    <li><a href="#">Facebook</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Legal</h3>
+                <ul>
+                    <li><a href="#">Términos de uso</a></li>
+                    <li><a href="#">Política de privacidad</a></li>
+                </ul>
             </div>
         </div>
-
-        <div id="trending-container" class="scroller">
-            </div>
-    </section>
+        <div class="footer-bottom">
+            <p>&copy; 2024 TMDB. Todos los derechos reservados.</p>
+        </div>
+    </footer>
 
     <script src="script.js"></script>
 </body>
