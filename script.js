@@ -589,12 +589,13 @@ function displayMovieDetails(data) {
     // Get trailer video (prefer YouTube trailers)
     let trailerKey = null;
     if (videos.results && videos.results.length > 0) {
+        // Only look for YouTube videos
         const trailer = videos.results.find(video => 
             video.site === 'YouTube' && (video.type === 'Trailer' || video.type === 'Teaser')
-        ) || videos.results.find(video => video.site === 'YouTube') || videos.results[0];
+        ) || videos.results.find(video => video.site === 'YouTube');
         
         // Validate trailerKey (YouTube video IDs are 11 characters, alphanumeric with _ and -)
-        if (trailer && trailer.site === 'YouTube' && trailer.key && /^[a-zA-Z0-9_-]{11}$/.test(trailer.key)) {
+        if (trailer && trailer.key && /^[a-zA-Z0-9_-]{11}$/.test(trailer.key)) {
             trailerKey = trailer.key;
         }
     }
@@ -666,7 +667,7 @@ function displayMovieDetails(data) {
                         <iframe
                             width="100%"
                             height="500"
-                            src="https://www.youtube.com/embed/${trailerKey}"
+                            src="https://www.youtube.com/embed/${encodeURIComponent(trailerKey)}"
                             title="YouTube video player"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                             allowfullscreen
