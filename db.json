@@ -5,7 +5,8 @@
       "email": "test@example.com",
       "password": "123456",
       "createdAt": "2025-11-18T23:24:07.613Z",
-      "id": 1
+      "id": 1,
+      "favorites": []
     }
   ]
 }
