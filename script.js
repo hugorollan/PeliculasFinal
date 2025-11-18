@@ -251,10 +251,22 @@ async function searchMovies(query) {
 }
 
 /**
+ * Sanitize text to prevent XSS attacks
+ */
+function sanitizeText(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+/**
  * Search movies by keyword
  */
 async function searchMoviesByKeyword(keywordId, keywordName) {
     const url = `${BASE_URL}/discover/movie?language=es-ES&with_keywords=${keywordId}&sort_by=popularity.desc&page=1`;
+    
+    // Sanitize keyword name to prevent XSS
+    const sanitizedKeywordName = sanitizeText(keywordName);
     
     try {
         showLoading();
@@ -280,7 +292,13 @@ async function searchMoviesByKeyword(keywordId, keywordName) {
             trendingContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         } else {
             hideLoading();
-            trendingContainer.innerHTML = `<p class="text-center" style="padding: 40px; color: var(--text-secondary);">No se encontraron películas con la palabra clave "${keywordName}".</p>`;
+            const noResultsDiv = document.createElement('p');
+            noResultsDiv.className = 'text-center';
+            noResultsDiv.style.padding = '40px';
+            noResultsDiv.style.color = 'var(--text-secondary)';
+            noResultsDiv.textContent = `No se encontraron películas con la palabra clave "${keywordName}".`;
+            trendingContainer.innerHTML = '';
+            trendingContainer.appendChild(noResultsDiv);
         }
     } catch (error) {
         console.error('Error searching movies by keyword:', error);
@@ -578,7 +596,8 @@ function displayMovieDetails(data) {
             video.site === 'YouTube' && (video.type === 'Trailer' || video.type === 'Teaser')
         ) || videos.results.find(video => video.site === 'YouTube') || videos.results[0];
         
-        if (trailer && trailer.site === 'YouTube') {
+        // Validate trailerKey (YouTube video IDs are 11 characters, alphanumeric with _ and -)
+        if (trailer && trailer.site === 'YouTube' && trailer.key && /^[a-zA-Z0-9_-]{11}$/.test(trailer.key)) {
             trailerKey = trailer.key;
         }
     }
@@ -650,9 +669,8 @@ function displayMovieDetails(data) {
                         <iframe
                             width="100%"
                             height="500"
-                            src="https://www.youtube.com/embed/${trailerKey}"
+                            src="https://www.youtube.com/embed/${encodeURIComponent(trailerKey)}"
                             title="YouTube video player"
-                            frameborder="0"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                             allowfullscreen
                             style="border-radius: 8px;">
