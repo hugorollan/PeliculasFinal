@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - TMDB</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="auth-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <nav class="navbar" role="navigation" aria-label="Navegación principal">
+        <div class="nav-wrapper">
+            <div class="nav-left">
+                <a href="index.html" class="nav-logo" aria-label="TMDB Inicio">TMDB</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="auth-main">
+        <div class="auth-container">
+            <!-- Login Form -->
+            <div id="login-form-container" class="auth-form-wrapper">
+                <div class="auth-card">
+                    <h2>Iniciar Sesión</h2>
+                    <p class="auth-subtitle">Accede a tu cuenta para disfrutar de todas las funcionalidades</p>
+                    
+                    <form id="login-form" class="auth-form">
+                        <div class="form-group">
+                            <label for="login-email">
+                                <i class="fas fa-envelope"></i> Correo Electrónico
+                            </label>
+                            <input 
+                                type="email" 
+                                id="login-email" 
+                                name="email" 
+                                placeholder="tu@email.com"
+                                required
+                                autocomplete="email">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="login-password">
+                                <i class="fas fa-lock"></i> Contraseña
+                            </label>
+                            <input 
+                                type="password" 
+                                id="login-password" 
+                                name="password" 
+                                placeholder="Tu contraseña"
+                                required
+                                autocomplete="current-password">
+                        </div>
+                        
+                        <div id="login-error" class="error-message" style="display: none;"></div>
+                        
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                        </button>
+                    </form>
+                    
+                    <div class="auth-toggle">
+                        <p>¿No tienes cuenta? <a href="#" id="show-register">Regístrate aquí</a></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Register Form -->
+            <div id="register-form-container" class="auth-form-wrapper" style="display: none;">
+                <div class="auth-card">
+                    <h2>Crear Cuenta</h2>
+                    <p class="auth-subtitle">Únete a nuestra comunidad de amantes del cine</p>
+                    
+                    <form id="register-form" class="auth-form">
+                        <div class="form-group">
+                            <label for="register-name">
+                                <i class="fas fa-user"></i> Nombre Completo
+                            </label>
+                            <input 
+                                type="text" 
+                                id="register-name" 
+                                name="name" 
+                                placeholder="Tu nombre completo"
+                                required
+                                autocomplete="name">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="register-email">
+                                <i class="fas fa-envelope"></i> Correo Electrónico
+                            </label>
+                            <input 
+                                type="email" 
+                                id="register-email" 
+                                name="email" 
+                                placeholder="tu@email.com"
+                                required
+                                autocomplete="email">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="register-password">
+                                <i class="fas fa-lock"></i> Contraseña
+                            </label>
+                            <input 
+                                type="password" 
+                                id="register-password" 
+                                name="password" 
+                                placeholder="Mínimo 6 caracteres"
+                                required
+                                minlength="6"
+                                autocomplete="new-password">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="register-password-confirm">
+                                <i class="fas fa-lock"></i> Confirmar Contraseña
+                            </label>
+                            <input 
+                                type="password" 
+                                id="register-password-confirm" 
+                                name="password-confirm" 
+                                placeholder="Repite tu contraseña"
+                                required
+                                minlength="6"
+                                autocomplete="new-password">
+                        </div>
+                        
+                        <div id="register-error" class="error-message" style="display: none;"></div>
+                        <div id="register-success" class="success-message" style="display: none;"></div>
+                        
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-user-plus"></i> Crear Cuenta
+                        </button>
+                    </form>
+                    
+                    <div class="auth-toggle">
+                        <p>¿Ya tienes cuenta? <a href="#" id="show-login">Inicia sesión aquí</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer" role="contentinfo">
+        <div class="footer-bottom">
+            <p>&copy; 2024 TMDB. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
