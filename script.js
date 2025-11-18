@@ -265,9 +265,6 @@ function sanitizeText(text) {
 async function searchMoviesByKeyword(keywordId, keywordName) {
     const url = `${BASE_URL}/discover/movie?language=es-ES&with_keywords=${keywordId}&sort_by=popularity.desc&page=1`;
     
-    // Sanitize keyword name to prevent XSS
-    const sanitizedKeywordName = sanitizeText(keywordName);
-    
     try {
         showLoading();
         const res = await fetch(url, options);
@@ -282,7 +279,7 @@ async function searchMoviesByKeyword(keywordId, keywordName) {
             displayMovies(data.results, trendingContainer);
             hideLoading();
             
-            // Update section title to show keyword search
+            // Update section title to show keyword search (using textContent is safe)
             const trendingTitle = document.getElementById('trending-title');
             if (trendingTitle) {
                 trendingTitle.textContent = `Películas con la palabra clave: "${keywordName}"`;
@@ -669,7 +666,7 @@ function displayMovieDetails(data) {
                         <iframe
                             width="100%"
                             height="500"
-                            src="https://www.youtube.com/embed/${encodeURIComponent(trailerKey)}"
+                            src="https://www.youtube.com/embed/${trailerKey}"
                             title="YouTube video player"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                             allowfullscreen
@@ -789,7 +786,7 @@ function displayMovieDetails(data) {
                     <h2>Palabras clave</h2>
                     <div class="keywords-list">
                         ${keywords.keywords.map(keyword => `
-                            <span class="keyword-badge" data-keyword-id="${keyword.id}" data-keyword-name="${keyword.name}">${keyword.name}</span>
+                            <span class="keyword-badge" data-keyword-id="${keyword.id}" data-keyword-name="${sanitizeText(keyword.name)}">${sanitizeText(keyword.name)}</span>
                         `).join('')}
                     </div>
                 </div>
