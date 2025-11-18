@@ -280,12 +280,13 @@ async function searchMoviesByKeyword(keywordId, keywordName) {
             trendingContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         } else {
             hideLoading();
+            // Clear container first, then add no results message
+            trendingContainer.innerHTML = '';
             const noResultsDiv = document.createElement('p');
             noResultsDiv.className = 'text-center';
             noResultsDiv.style.padding = '40px';
             noResultsDiv.style.color = 'var(--text-secondary)';
             noResultsDiv.textContent = `No se encontraron películas con la palabra clave "${keywordName}".`;
-            trendingContainer.innerHTML = '';
             trendingContainer.appendChild(noResultsDiv);
         }
     } catch (error) {
@@ -577,13 +578,14 @@ function displayMovieDetails(data) {
     const screenplay = credits.crew.filter(person => person.job === 'Screenplay').slice(0, 2);
     const story = credits.crew.filter(person => person.job === 'Story').slice(0, 2);
     
-    // Get trailer video (prefer YouTube trailers)
+    // Get trailer video (prefer YouTube trailers and teasers)
     let trailerKey = null;
     if (videos.results && videos.results.length > 0) {
-        // Only look for YouTube videos
-        const trailer = videos.results.find(video => 
-            video.site === 'YouTube' && (video.type === 'Trailer' || video.type === 'Teaser')
-        ) || videos.results.find(video => video.site === 'YouTube');
+        // Find YouTube video, prioritizing trailers and teasers
+        const youtubeVideos = videos.results.filter(video => video.site === 'YouTube');
+        const trailer = youtubeVideos.find(video => 
+            video.type === 'Trailer' || video.type === 'Teaser'
+        ) || youtubeVideos[0];
         
         // Validate trailerKey (YouTube video IDs are 11 characters, alphanumeric with _ and -)
         if (trailer && trailer.key && /^[a-zA-Z0-9_-]{11}$/.test(trailer.key)) {
@@ -794,7 +796,6 @@ function displayMovieDetails(data) {
                 badge.setAttribute('data-keyword-id', keyword.id);
                 badge.setAttribute('data-keyword-name', keyword.name);
                 badge.textContent = keyword.name;
-                badge.style.cursor = 'pointer';
                 keywordsListContainer.appendChild(badge);
             });
         }
