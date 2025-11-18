@@ -251,15 +251,6 @@ async function searchMovies(query) {
 }
 
 /**
- * Sanitize text to prevent XSS attacks
- */
-function sanitizeText(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-/**
  * Search movies by keyword
  */
 async function searchMoviesByKeyword(keywordId, keywordName) {
@@ -667,7 +658,7 @@ function displayMovieDetails(data) {
                         <iframe
                             width="100%"
                             height="500"
-                            src="https://www.youtube.com/embed/${encodeURIComponent(trailerKey)}"
+                            src="https://www.youtube.com/embed/${trailerKey}"
                             title="YouTube video player"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                             allowfullscreen
@@ -785,17 +776,29 @@ function displayMovieDetails(data) {
             ${keywords.keywords.length > 0 ? `
                 <div class="detail-section">
                     <h2>Palabras clave</h2>
-                    <div class="keywords-list">
-                        ${keywords.keywords.map(keyword => `
-                            <span class="keyword-badge" data-keyword-id="${keyword.id}" data-keyword-name="${sanitizeText(keyword.name)}">${sanitizeText(keyword.name)}</span>
-                        `).join('')}
-                    </div>
+                    <div class="keywords-list" id="keywords-list-container"></div>
                 </div>
             ` : ''}
         </div>
     `;
     
     movieDetailContainer.innerHTML = html;
+    
+    // Populate keywords using safe DOM methods
+    if (keywords.keywords.length > 0) {
+        const keywordsListContainer = movieDetailContainer.querySelector('#keywords-list-container');
+        if (keywordsListContainer) {
+            keywords.keywords.forEach(keyword => {
+                const badge = document.createElement('span');
+                badge.className = 'keyword-badge';
+                badge.setAttribute('data-keyword-id', keyword.id);
+                badge.setAttribute('data-keyword-name', keyword.name);
+                badge.textContent = keyword.name;
+                badge.style.cursor = 'pointer';
+                keywordsListContainer.appendChild(badge);
+            });
+        }
+    }
     
     // Add click events to recommendation cards
     const recommendationCards = movieDetailContainer.querySelectorAll('.recommendation-card');
