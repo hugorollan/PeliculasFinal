@@ -12,6 +12,8 @@ const loadingSpinner = document.getElementById('loading-spinner');
 const errorMessage = document.getElementById('error-message');
 const searchForm = document.getElementById('search-form');
 const searchInput = document.getElementById('search-input');
+const movieModal = document.getElementById('movie-modal');
+const movieDetailContainer = document.getElementById('movie-detail-container');
 
 // Request Options
 const options = {
@@ -93,6 +95,7 @@ function createMovieCard(movie) {
     const card = document.createElement('div');
     card.classList.add('card');
     card.setAttribute('data-movie-id', id);
+    card.style.cursor = 'pointer';
     
     card.innerHTML = `
         <div class="image-content">
@@ -110,6 +113,9 @@ function createMovieCard(movie) {
         </div>
     `;
 
+    // Add click event to open movie details
+    card.addEventListener('click', () => openMovieDetails(id));
+
     return card;
 }
 
@@ -124,6 +130,7 @@ function createTrailerCard(movie) {
     const card = document.createElement('div');
     card.classList.add('trailer-card');
     card.setAttribute('data-movie-id', id);
+    card.style.cursor = 'pointer';
     
     card.innerHTML = `
         <div class="trailer-thumbnail">
@@ -137,6 +144,9 @@ function createTrailerCard(movie) {
             <p>Ver tráiler</p>
         </div>
     `;
+
+    // Add click event to open movie details
+    card.addEventListener('click', () => openMovieDetails(id));
 
     return card;
 }
@@ -386,6 +396,332 @@ function setupAccessibility() {
     }
 }
 
+// ============ MOVIE DETAIL FUNCTIONS ============
+
+/**
+ * Open movie details modal
+ */
+async function openMovieDetails(movieId) {
+    if (!movieModal || !movieDetailContainer) return;
+    
+    // Show modal with loading state
+    movieModal.style.display = 'block';
+    movieDetailContainer.innerHTML = '<div class="loading-spinner"><div class="spinner"></div><p>Cargando detalles...</p></div>';
+    document.body.style.overflow = 'hidden';
+    
+    try {
+        // Fetch all required data in parallel
+        const [details, credits, reviews, videos, recommendations, keywords] = await Promise.all([
+            fetchMovieDetails(movieId),
+            fetchMovieCredits(movieId),
+            fetchMovieReviews(movieId),
+            fetchMovieVideos(movieId),
+            fetchMovieRecommendations(movieId),
+            fetchMovieKeywords(movieId)
+        ]);
+        
+        // Display the movie details
+        displayMovieDetails({
+            details,
+            credits,
+            reviews,
+            videos,
+            recommendations,
+            keywords
+        });
+    } catch (error) {
+        console.error('Error loading movie details:', error);
+        movieDetailContainer.innerHTML = '<div class="error-message"><i class="fas fa-exclamation-triangle"></i><p>Error al cargar los detalles de la película.</p></div>';
+    }
+}
+
+/**
+ * Close movie details modal
+ */
+function closeMovieDetails() {
+    if (movieModal) {
+        movieModal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+}
+
+/**
+ * Fetch movie details
+ */
+async function fetchMovieDetails(movieId) {
+    const url = `${BASE_URL}/movie/${movieId}?language=es-ES`;
+    const res = await fetch(url, options);
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    return await res.json();
+}
+
+/**
+ * Fetch movie credits
+ */
+async function fetchMovieCredits(movieId) {
+    const url = `${BASE_URL}/movie/${movieId}/credits?language=es-ES`;
+    const res = await fetch(url, options);
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    return await res.json();
+}
+
+/**
+ * Fetch movie reviews
+ */
+async function fetchMovieReviews(movieId) {
+    const url = `${BASE_URL}/movie/${movieId}/reviews?language=es-ES&page=1`;
+    const res = await fetch(url, options);
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    return await res.json();
+}
+
+/**
+ * Fetch movie videos
+ */
+async function fetchMovieVideos(movieId) {
+    const url = `${BASE_URL}/movie/${movieId}/videos?language=es-ES`;
+    const res = await fetch(url, options);
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    return await res.json();
+}
+
+/**
+ * Fetch movie recommendations
+ */
+async function fetchMovieRecommendations(movieId) {
+    const url = `${BASE_URL}/movie/${movieId}/recommendations?language=es-ES&page=1`;
+    const res = await fetch(url, options);
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    return await res.json();
+}
+
+/**
+ * Fetch movie keywords
+ */
+async function fetchMovieKeywords(movieId) {
+    const url = `${BASE_URL}/movie/${movieId}/keywords`;
+    const res = await fetch(url, options);
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    return await res.json();
+}
+
+/**
+ * Display movie details in modal
+ */
+function displayMovieDetails(data) {
+    const { details, credits, reviews, videos, recommendations, keywords } = data;
+    
+    // Format runtime
+    const hours = Math.floor(details.runtime / 60);
+    const minutes = details.runtime % 60;
+    const runtimeStr = `${hours}h ${minutes}m`;
+    
+    // Format date
+    const releaseYear = details.release_date ? new Date(details.release_date).getFullYear() : '';
+    const releaseDateFormatted = formatDate(details.release_date);
+    
+    // Format rating
+    const votePercent = Math.round(details.vote_average * 10);
+    const ratingColor = getRatingColor(votePercent);
+    
+    // Format budget and revenue
+    const budgetFormatted = details.budget ? `$${details.budget.toLocaleString('es-ES')}` : 'N/A';
+    const revenueFormatted = details.revenue ? `$${details.revenue.toLocaleString('es-ES')}` : 'N/A';
+    
+    // Get director and key crew
+    const director = credits.crew.find(person => person.job === 'Director');
+    const screenplay = credits.crew.filter(person => person.job === 'Screenplay').slice(0, 2);
+    const story = credits.crew.filter(person => person.job === 'Story').slice(0, 2);
+    
+    // Build HTML
+    let html = `
+        <div class="movie-detail-header" style="background-image: url('${details.backdrop_path ? BACKDROP_URL + details.backdrop_path : ''}');">
+            <div class="movie-detail-header-content">
+                <div class="movie-poster-large">
+                    <img src="${details.poster_path ? IMAGE_URL + details.poster_path : ''}" alt="${details.title}">
+                </div>
+                <div class="movie-info-main">
+                    <div class="movie-title-section">
+                        <h1>${details.title} <span class="movie-title-year">(${releaseYear})</span></h1>
+                    </div>
+                    
+                    <div class="movie-facts">
+                        <span>${releaseDateFormatted}</span>
+                        ${details.genres.length > 0 ? `<span class="separator"></span>` : ''}
+                        ${details.genres.map(g => g.name).join(', ')}
+                        ${details.runtime ? `<span class="separator"></span><span>${runtimeStr}</span>` : ''}
+                    </div>
+                    
+                    <div class="movie-user-score">
+                        <div class="score-circle-large" style="border-color: ${ratingColor}">
+                            <span class="score-number">${votePercent}</span>
+                            <span class="score-percent">%</span>
+                        </div>
+                        <span class="score-label">Puntuación<br>de usuarios</span>
+                    </div>
+                    
+                    ${details.tagline ? `<div class="movie-tagline">${details.tagline}</div>` : ''}
+                    
+                    <div class="movie-overview-section">
+                        <h3>Vista general</h3>
+                        <p>${details.overview || 'No hay sinopsis disponible.'}</p>
+                    </div>
+                    
+                    <div class="movie-credits-featured">
+                        ${director ? `
+                            <div class="credit-item">
+                                <h4>${director.name}</h4>
+                                <p>Director</p>
+                            </div>
+                        ` : ''}
+                        ${screenplay.map(person => `
+                            <div class="credit-item">
+                                <h4>${person.name}</h4>
+                                <p>Screenplay</p>
+                            </div>
+                        `).join('')}
+                        ${story.map(person => `
+                            <div class="credit-item">
+                                <h4>${person.name}</h4>
+                                <p>Story</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="movie-detail-body">
+            <!-- Cast Section -->
+            <div class="detail-section">
+                <h2>Reparto principal</h2>
+                ${credits.cast.length > 0 ? `
+                    <div class="cast-scroller">
+                        ${credits.cast.slice(0, 10).map(person => `
+                            <div class="cast-card">
+                                ${person.profile_path ? `
+                                    <div class="cast-image">
+                                        <img src="${IMAGE_URL + person.profile_path}" alt="${person.name}">
+                                    </div>
+                                ` : `
+                                    <div class="cast-no-image">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                `}
+                                <div class="cast-info">
+                                    <div class="cast-name">${person.name}</div>
+                                    <div class="cast-character">${person.character}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : '<div class="no-content">No hay información de reparto disponible.</div>'}
+            </div>
+            
+            <!-- Reviews Section -->
+            <div class="detail-section">
+                <h2>Reseñas</h2>
+                ${reviews.results.length > 0 ? `
+                    ${reviews.results.slice(0, 3).map(review => `
+                        <div class="review-card">
+                            <div class="review-header">
+                                <div class="review-avatar">
+                                    ${review.author_details.avatar_path ? `
+                                        <img src="https://image.tmdb.org/t/p/w200${review.author_details.avatar_path}" alt="${review.author}">
+                                    ` : `
+                                        <div class="review-avatar-placeholder">
+                                            ${review.author.charAt(0).toUpperCase()}
+                                        </div>
+                                    `}
+                                </div>
+                                <div class="review-author-info">
+                                    <h4>Una reseña de ${review.author}</h4>
+                                    <div class="review-date">Escrito por ${review.author} el ${formatDate(review.created_at)}</div>
+                                </div>
+                            </div>
+                            <div class="review-content">
+                                ${review.content}
+                            </div>
+                        </div>
+                    `).join('')}
+                ` : '<div class="no-content">No hay reseñas disponibles.</div>'}
+            </div>
+            
+            <!-- Recommendations Section -->
+            <div class="detail-section">
+                <h2>Recomendaciones</h2>
+                ${recommendations.results.length > 0 ? `
+                    <div class="recommendations-scroller">
+                        ${recommendations.results.slice(0, 10).map(movie => `
+                            <div class="recommendation-card" data-movie-id="${movie.id}">
+                                ${movie.backdrop_path ? `
+                                    <div class="recommendation-image">
+                                        <img src="${BACKDROP_URL + movie.backdrop_path}" alt="${movie.title}">
+                                    </div>
+                                ` : ''}
+                                <div class="recommendation-info">
+                                    <div class="recommendation-title">${movie.title}</div>
+                                    <div class="recommendation-rating">${Math.round(movie.vote_average * 10)}%</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : '<div class="no-content">No hay recomendaciones disponibles.</div>'}
+            </div>
+            
+            <!-- Additional Information -->
+            <div class="detail-section">
+                <h2>Información adicional</h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <h4>Título original</h4>
+                        <p>${details.original_title}</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>Estado</h4>
+                        <p>${details.status === 'Released' ? 'Estrenada' : details.status}</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>Idioma original</h4>
+                        <p>${details.original_language.toUpperCase()}</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>Presupuesto</h4>
+                        <p>${budgetFormatted}</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>Ingresos</h4>
+                        <p>${revenueFormatted}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Keywords Section -->
+            ${keywords.keywords.length > 0 ? `
+                <div class="detail-section">
+                    <h2>Palabras clave</h2>
+                    <div class="keywords-list">
+                        ${keywords.keywords.map(keyword => `
+                            <span class="keyword-badge">${keyword.name}</span>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : ''}
+        </div>
+    `;
+    
+    movieDetailContainer.innerHTML = html;
+    
+    // Add click events to recommendation cards
+    const recommendationCards = movieDetailContainer.querySelectorAll('.recommendation-card');
+    recommendationCards.forEach(card => {
+        card.addEventListener('click', () => {
+            const movieId = card.getAttribute('data-movie-id');
+            openMovieDetails(movieId);
+        });
+    });
+}
+
 // ============ INITIALIZATION ============
 
 /**
@@ -398,6 +734,7 @@ function init() {
     setupToggleSelectors();
     setupSearchForm();
     setupAccessibility();
+    setupModalHandlers();
     
     // Load initial data
     getTrendingMovies('day');
@@ -405,6 +742,32 @@ function init() {
     getUpcomingMovies();
     
     console.log('Application initialized successfully!');
+}
+
+/**
+ * Setup modal event handlers
+ */
+function setupModalHandlers() {
+    if (movieModal) {
+        // Close on overlay click
+        const overlay = movieModal.querySelector('.modal-overlay');
+        if (overlay) {
+            overlay.addEventListener('click', closeMovieDetails);
+        }
+        
+        // Close on close button click
+        const closeBtn = movieModal.querySelector('.modal-close');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', closeMovieDetails);
+        }
+        
+        // Close on ESC key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && movieModal.style.display === 'block') {
+                closeMovieDetails();
+            }
+        });
+    }
 }
 
 // Start the application when DOM is ready
