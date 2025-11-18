@@ -4,6 +4,9 @@ const BASE_URL = 'https://api.themoviedb.org/3';
 const IMAGE_URL = 'https://image.tmdb.org/t/p/w500';
 const BACKDROP_URL = 'https://image.tmdb.org/t/p/w780';
 
+// YouTube video ID validation regex (11 characters, alphanumeric with _ and -)
+const YOUTUBE_VIDEO_ID_REGEX = /^[a-zA-Z0-9_-]{11}$/;
+
 // DOM Elements
 const trendingContainer = document.getElementById('trending-container');
 const popularContainer = document.getElementById('popular-container');
@@ -280,14 +283,13 @@ async function searchMoviesByKeyword(keywordId, keywordName) {
             trendingContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         } else {
             hideLoading();
-            // Clear container first, then add no results message
-            trendingContainer.innerHTML = '';
+            // Clear container consistently using replaceChildren
             const noResultsDiv = document.createElement('p');
             noResultsDiv.className = 'text-center';
             noResultsDiv.style.padding = '40px';
             noResultsDiv.style.color = 'var(--text-secondary)';
             noResultsDiv.textContent = `No se encontraron películas con la palabra clave "${keywordName}".`;
-            trendingContainer.appendChild(noResultsDiv);
+            trendingContainer.replaceChildren(noResultsDiv);
         }
     } catch (error) {
         console.error('Error searching movies by keyword:', error);
@@ -587,8 +589,8 @@ function displayMovieDetails(data) {
             video.type === 'Trailer' || video.type === 'Teaser'
         ) || youtubeVideos[0];
         
-        // Validate trailerKey (YouTube video IDs are 11 characters, alphanumeric with _ and -)
-        if (trailer && trailer.key && /^[a-zA-Z0-9_-]{11}$/.test(trailer.key)) {
+        // Validate trailerKey with regex to ensure it's safe for URL embedding
+        if (trailer && trailer.key && YOUTUBE_VIDEO_ID_REGEX.test(trailer.key)) {
             trailerKey = trailer.key;
         }
     }
@@ -653,6 +655,7 @@ function displayMovieDetails(data) {
         
         <div class="movie-detail-body">
             <!-- Trailer Section -->
+            <!-- trailerKey is safe to use here as it's validated with YOUTUBE_VIDEO_ID_REGEX -->
             ${trailerKey ? `
                 <div class="detail-section">
                     <h2>Tráiler</h2>
