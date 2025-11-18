@@ -1,0 +1,23 @@
+{
+  "name": "peliculas-final",
+  "version": "1.0.0",
+  "description": "Aplicación web de películas con sistema de autenticación",
+  "main": "index.html",
+  "scripts": {
+    "server": "json-server --watch db.json --port 3000",
+    "dev": "concurrently \"npm run server\" \"python3 -m http.server 8080\"",
+    "start": "python3 -m http.server 8080"
+  },
+  "keywords": [
+    "movies",
+    "tmdb",
+    "authentication",
+    "vanilla-js"
+  ],
+  "author": "Hugo Rollan",
+  "license": "MIT",
+  "devDependencies": {
+    "json-server": "^0.17.4",
+    "concurrently": "^8.2.2"
+  }
+}

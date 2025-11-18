@@ -663,10 +663,12 @@ function displayMovieDetails(data) {
                         <iframe
                             width="100%"
                             height="500"
-                            src="https://www.youtube.com/embed/${trailerKey}"
+                            src="https://www.youtube.com/embed/${trailerKey}?rel=0"
                             title="YouTube video player"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                             allowfullscreen
+                            referrerpolicy="strict-origin-when-cross-origin"
                             style="border-radius: 8px;">
                         </iframe>
                     </div>
