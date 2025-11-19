@@ -1790,7 +1790,7 @@ function displayMovieDetails(data) {
             <div class="detail-section" id="user-rating-section">
                 <h2>Tu Valoración</h2>
                 <div class="star-rating-container">
-                    <div class="star-rating" data-movie-id="${details.id}">
+                    <div class="star-rating" data-movie-id="${details.id}" data-content-type="${type}">
                         <i class="far fa-star star" data-rating="1"></i>
                         <i class="far fa-star star" data-rating="2"></i>
                         <i class="far fa-star star" data-rating="3"></i>
@@ -1799,6 +1799,15 @@ function displayMovieDetails(data) {
                     </div>
                     <span class="rating-text">Haz clic en una estrella para valorar</span>
                 </div>
+            </div>
+            
+            <!-- Add to Watchlist Section -->
+            <div class="detail-section" id="watchlist-section">
+                <h2>Mi Lista</h2>
+                <button class="btn-add-to-watchlist" data-item-id="${details.id}" data-item-type="${type}">
+                    <i class="fas fa-bookmark"></i>
+                    <span>Añadir a mi lista</span>
+                </button>
             </div>
             
             <!-- Trailer Section -->
@@ -1995,15 +2004,18 @@ function displayMovieDetails(data) {
     });
     
     // Setup star rating interaction
-    setupStarRating(details.id);
+    setupStarRating(details.id, type);
+    
+    // Setup watchlist button
+    setupWatchlistButton(details.id, type);
 }
 
 // ============ RATING SYSTEM ============
 
 /**
- * Setup star rating interaction for a movie
+ * Setup star rating interaction for a movie/TV show
  */
-function setupStarRating(movieId) {
+function setupStarRating(itemId, type = 'movie') {
     const currentUser = getCurrentUser();
     const stars = document.querySelectorAll('.star-rating .star');
     const ratingText = document.querySelector('.rating-text');
@@ -2014,13 +2026,13 @@ function setupStarRating(movieId) {
     // Check if user is logged in
     if (!currentUser) {
         if (ratingText) {
-            ratingText.textContent = 'Inicia sesión para valorar esta película';
+            ratingText.textContent = 'Inicia sesión para valorar';
         }
         return;
     }
     
     // Load user's existing rating if any
-    const existingRating = getUserRatingForMovie(currentUser, movieId);
+    const existingRating = getUserRatingForItem(currentUser, itemId, type);
     if (existingRating) {
         updateStarDisplay(stars, existingRating.score);
         if (ratingText) {
@@ -2048,7 +2060,7 @@ function setupStarRating(movieId) {
     stars.forEach(star => {
         star.addEventListener('click', async () => {
             const rating = parseInt(star.getAttribute('data-rating'));
-            await saveMovieRating(movieId, rating);
+            await saveItemRating(itemId, rating, type);
         });
     });
 }
@@ -2076,21 +2088,23 @@ function updateStarDisplay(stars, rating, isHover = false) {
 }
 
 /**
- * Get user's rating for a specific movie
+ * Get user's rating for a specific item (movie or TV)
  */
-function getUserRatingForMovie(user, movieId) {
+function getUserRatingForItem(user, itemId, type = 'movie') {
     if (!user.ratings || user.ratings.length === 0) return null;
-    return user.ratings.find(rating => rating.movieId === parseInt(movieId));
+    return user.ratings.find(rating => 
+        rating.movieId === parseInt(itemId) && rating.type === type
+    );
 }
 
 /**
- * Save movie rating
+ * Save item rating (movie or TV)
  */
-async function saveMovieRating(movieId, score) {
+async function saveItemRating(itemId, score, type = 'movie') {
     const currentUser = getCurrentUser();
     
     if (!currentUser) {
-        showToast('Por favor, inicia sesión para valorar películas', 'warning');
+        showToast('Por favor, inicia sesión para valorar', 'warning');
         return;
     }
     
@@ -2101,10 +2115,13 @@ async function saveMovieRating(movieId, score) {
         }
         
         // Check if rating already exists
-        const existingRatingIndex = currentUser.ratings.findIndex(r => r.movieId === parseInt(movieId));
+        const existingRatingIndex = currentUser.ratings.findIndex(r => 
+            r.movieId === parseInt(itemId) && r.type === type
+        );
         
         const newRating = {
-            movieId: parseInt(movieId),
+            movieId: parseInt(itemId),
+            type: type,
             score: score,
             date: new Date().toISOString()
         };
@@ -2144,11 +2161,117 @@ async function saveMovieRating(movieId, score) {
             ratingText.textContent = `Tu valoración: ${score}/5 estrellas`;
         }
         
-        showToast(`¡Película valorada con ${score} estrellas!`, 'success');
+        const itemType = type === 'movie' ? 'Película' : 'Serie';
+        showToast(`¡${itemType} valorada con ${score} estrellas!`, 'success');
         
     } catch (error) {
         console.error('Error saving rating:', error);
         showToast('Hubo un error al guardar tu valoración. Por favor, verifica que json-server esté ejecutándose.', 'error');
+    }
+}
+
+// ============ WATCHLIST FUNCTIONS ============
+
+/**
+ * Setup watchlist button in movie detail modal
+ */
+function setupWatchlistButton(itemId, type = 'movie') {
+    const watchlistBtn = document.querySelector('.btn-add-to-watchlist');
+    
+    if (!watchlistBtn) return;
+    
+    const currentUser = getCurrentUser();
+    
+    // Check if user is logged in
+    if (!currentUser) {
+        watchlistBtn.innerHTML = '<i class="fas fa-lock"></i><span>Inicia sesión para añadir a tu lista</span>';
+        watchlistBtn.disabled = true;
+        return;
+    }
+    
+    // Check if item is already in watchlist
+    const isInWatchlist = currentUser.watchlist && 
+        currentUser.watchlist.some(item => item.id === parseInt(itemId) && item.type === type);
+    
+    if (isInWatchlist) {
+        watchlistBtn.innerHTML = '<i class="fas fa-check"></i><span>En mi lista</span>';
+        watchlistBtn.classList.add('in-watchlist');
+    }
+    
+    // Add click event
+    watchlistBtn.addEventListener('click', async () => {
+        await toggleWatchlist(itemId, type);
+    });
+}
+
+/**
+ * Toggle item in watchlist
+ */
+async function toggleWatchlist(itemId, type = 'movie') {
+    const currentUser = getCurrentUser();
+    
+    if (!currentUser) {
+        showToast('Por favor, inicia sesión para usar tu lista', 'warning');
+        return;
+    }
+    
+    try {
+        // Initialize watchlist array if it doesn't exist
+        if (!currentUser.watchlist) {
+            currentUser.watchlist = [];
+        }
+        
+        // Check if item is already in watchlist
+        const itemIndex = currentUser.watchlist.findIndex(item => 
+            item.id === parseInt(itemId) && item.type === type
+        );
+        
+        let updatedWatchlist;
+        let isAdding = false;
+        
+        if (itemIndex > -1) {
+            // Remove from watchlist
+            updatedWatchlist = currentUser.watchlist.filter((item, index) => index !== itemIndex);
+        } else {
+            // Add to watchlist
+            updatedWatchlist = [...currentUser.watchlist, { id: parseInt(itemId), type: type }];
+            isAdding = true;
+        }
+        
+        // Update user in json-server
+        const response = await fetch(`http://localhost:3000/usuarios/${currentUser.id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ watchlist: updatedWatchlist })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Error al actualizar la lista');
+        }
+        
+        // Update localStorage
+        currentUser.watchlist = updatedWatchlist;
+        updateCurrentUser(currentUser);
+        
+        // Update button UI
+        const watchlistBtn = document.querySelector('.btn-add-to-watchlist');
+        if (watchlistBtn) {
+            if (isAdding) {
+                watchlistBtn.innerHTML = '<i class="fas fa-check"></i><span>En mi lista</span>';
+                watchlistBtn.classList.add('in-watchlist');
+                showToast('Añadido a tu lista', 'success');
+            } else {
+                watchlistBtn.innerHTML = '<i class="fas fa-bookmark"></i><span>Añadir a mi lista</span>';
+                watchlistBtn.classList.remove('in-watchlist');
+                showToast('Eliminado de tu lista', 'success');
+            }
+        }
+        
+    } catch (error) {
+        console.error('Error toggling watchlist:', error);
+        showToast('Error al actualizar tu lista', 'error');
     }
 }
 
