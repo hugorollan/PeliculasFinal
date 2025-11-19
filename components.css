@@ -1330,3 +1330,60 @@
     color: var(--text-secondary);
     font-weight: 500;
 }
+
+/* ========================================
+   WATCHLIST BUTTON
+   ======================================== */
+
+.btn-add-to-watchlist {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 28px;
+    background: linear-gradient(to right, var(--tmdb-light-green), var(--tmdb-light-blue));
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(1, 180, 228, 0.3);
+}
+
+.btn-add-to-watchlist:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(1, 180, 228, 0.4);
+}
+
+.btn-add-to-watchlist:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.btn-add-to-watchlist:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-add-to-watchlist.in-watchlist {
+    background: #21d07a;
+}
+
+.btn-add-to-watchlist.in-watchlist:hover:not(:disabled) {
+    background: #1ab56a;
+}
+
+.btn-add-to-watchlist i {
+    font-size: 1.2rem;
+}
+
+#watchlist-section {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#watchlist-section h2 {
+    margin: 0;
+}
