@@ -297,6 +297,18 @@
     flex: 1;
 }
 
+.activity-text {
+    font-weight: 400;
+    color: var(--text-primary);
+    margin-bottom: 3px;
+    line-height: 1.4;
+}
+
+.activity-time {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
 .activity-title {
     font-weight: 600;
     color: var(--text-primary);

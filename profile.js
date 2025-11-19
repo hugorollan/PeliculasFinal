@@ -97,6 +97,9 @@ async function initializeProfile() {
     // Load favorites
     await loadUserFavorites(currentUser);
     
+    // Load watched movies
+    await loadWatchedMovies(currentUser);
+    
     // Load watchlist
     await loadWatchlist(currentUser);
 }
@@ -275,6 +278,141 @@ async function loadUserFavorites(user) {
             </div>
         `;
     }
+}
+
+/**
+ * Load user watched movies
+ */
+async function loadWatchedMovies(user) {
+    const activityList = document.querySelector('.activity-list');
+    
+    if (!activityList) return;
+    
+    // Get watched movies
+    const watchedMovies = user.watchedMovies || [];
+    
+    // Check if user has any watched movies
+    if (watchedMovies.length === 0) {
+        activityList.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-clipboard-list"></i>
+                <p data-i18n="profile_no_watched">${getTranslation('profile_no_watched')}</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Clear container
+    activityList.innerHTML = '';
+    
+    // Sort by watched date (most recent first) and limit to first 10 items
+    const sortedWatched = [...watchedMovies]
+        .sort((a, b) => new Date(b.watchedAt) - new Date(a.watchedAt))
+        .slice(0, 10);
+    
+    try {
+        // Fetch details for each watched item
+        const promises = sortedWatched.map(item => 
+            fetch(`${BASE_URL}/${item.type}/${item.id}?language=es-ES`, profileOptions)
+                .then(response => response.json())
+                .then(data => ({ ...data, contentType: item.type, watchedAt: item.watchedAt }))
+                .catch(error => {
+                    console.error(`Error loading ${item.type} ${item.id}:`, error);
+                    return null;
+                })
+        );
+        
+        const items = await Promise.all(promises);
+        
+        // Filter out null results
+        const validItems = items.filter(item => item !== null);
+        
+        if (validItems.length === 0) {
+            activityList.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>Error al cargar las películas vistas.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        // Create activity items
+        validItems.forEach(item => {
+            const activityItem = createWatchedActivityItem(item, item.contentType);
+            activityList.appendChild(activityItem);
+        });
+        
+    } catch (error) {
+        console.error('Error loading watched movies:', error);
+        activityList.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>Error al cargar las películas vistas.</p>
+            </div>
+        `;
+    }
+}
+
+/**
+ * Create watched activity item element
+ */
+function createWatchedActivityItem(item, type = 'movie') {
+    const activityItem = document.createElement('div');
+    activityItem.className = 'activity-item';
+    activityItem.dataset.itemId = item.id;
+    activityItem.dataset.itemType = type;
+    
+    const icon = document.createElement('div');
+    icon.className = 'activity-icon';
+    icon.innerHTML = '<i class="fas fa-eye"></i>';
+    
+    const content = document.createElement('div');
+    content.className = 'activity-content';
+    
+    const text = document.createElement('div');
+    text.className = 'activity-text';
+    const title = type === 'movie' ? item.title : item.name;
+    text.innerHTML = `<strong>${getTranslation('mark_as_watched')}</strong>: ${title}`;
+    
+    const time = document.createElement('div');
+    time.className = 'activity-time';
+    time.textContent = formatTimeAgo(item.watchedAt);
+    
+    content.appendChild(text);
+    content.appendChild(time);
+    
+    activityItem.appendChild(icon);
+    activityItem.appendChild(content);
+    
+    // Make item clickable
+    activityItem.style.cursor = 'pointer';
+    activityItem.addEventListener('click', () => {
+        window.location.href = `index.html#${type}-${item.id}`;
+    });
+    
+    return activityItem;
+}
+
+/**
+ * Format time ago (e.g., "hace 2 horas")
+ */
+function formatTimeAgo(dateString) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffSeconds = Math.floor(diffMs / 1000);
+    const diffMinutes = Math.floor(diffSeconds / 60);
+    const diffHours = Math.floor(diffMinutes / 60);
+    const diffDays = Math.floor(diffHours / 24);
+    
+    if (diffSeconds < 60) return 'hace unos segundos';
+    if (diffMinutes < 60) return `hace ${diffMinutes} minuto${diffMinutes !== 1 ? 's' : ''}`;
+    if (diffHours < 24) return `hace ${diffHours} hora${diffHours !== 1 ? 's' : ''}`;
+    if (diffDays < 7) return `hace ${diffDays} día${diffDays !== 1 ? 's' : ''}`;
+    if (diffDays < 30) return `hace ${Math.floor(diffDays / 7)} semana${Math.floor(diffDays / 7) !== 1 ? 's' : ''}`;
+    if (diffDays < 365) return `hace ${Math.floor(diffDays / 30)} mes${Math.floor(diffDays / 30) !== 1 ? 'es' : ''}`;
+    return `hace ${Math.floor(diffDays / 365)} año${Math.floor(diffDays / 365) !== 1 ? 's' : ''}`;
 }
 
 /**

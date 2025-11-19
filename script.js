@@ -29,12 +29,12 @@ const TRANSLATIONS = {
         movies_popular: 'Popular',
         movies_now_playing: 'En cartelera',
         movies_upcoming: 'Próximamente',
-        movies_top_rated: 'Mejor puntuadas',
+        movies_top_rated: 'Mejor valoradas',
         // TV Shows dropdown
         tv_popular: 'Popular',
         tv_airing_today: 'En emisión hoy',
         tv_on_the_air: 'En televisión',
-        tv_top_rated: 'Mejor puntuadas',
+        tv_top_rated: 'Mejor valoradas',
         // People dropdown
         people_popular: 'Popular',
         // More dropdown
@@ -183,7 +183,13 @@ const TRANSLATIONS = {
         profile_upcoming: 'Próximamente en Mi Lista',
         profile_no_upcoming: 'No hay próximas películas en tu lista de seguimiento.',
         profile_choose_avatar: 'Elige tu Avatar',
-        profile_avatar_subtitle: 'Selecciona un icono para personalizar tu perfil'
+        profile_avatar_subtitle: 'Selecciona un icono para personalizar tu perfil',
+        // Watched movies
+        mark_as_watched: 'Marcar como vista',
+        watched_movies: 'Películas Vistas',
+        profile_watched: 'Vistas',
+        profile_no_watched: 'No has marcado ninguna película como vista.',
+        remove_from_watched: 'Quitar de vistas'
     },
     'en': {
         nav_movies: 'Movies',
@@ -365,7 +371,13 @@ const TRANSLATIONS = {
         profile_upcoming: 'Upcoming in My List',
         profile_no_upcoming: 'There are no upcoming movies on your watchlist.',
         profile_choose_avatar: 'Choose your Avatar',
-        profile_avatar_subtitle: 'Select an icon to customize your profile'
+        profile_avatar_subtitle: 'Select an icon to customize your profile',
+        // Watched movies
+        mark_as_watched: 'Mark as watched',
+        watched_movies: 'Watched Movies',
+        profile_watched: 'Watched',
+        profile_no_watched: 'You haven\'t marked any movies as watched.',
+        remove_from_watched: 'Remove from watched'
     },
     'fr': {
         nav_movies: 'Films',
@@ -547,7 +559,13 @@ const TRANSLATIONS = {
         profile_upcoming: 'À venir dans ma liste',
         profile_no_upcoming: 'Il n\'y a pas de films à venir dans votre liste de suivi.',
         profile_choose_avatar: 'Choisissez votre Avatar',
-        profile_avatar_subtitle: 'Sélectionnez une icône pour personnaliser votre profil'
+        profile_avatar_subtitle: 'Sélectionnez une icône pour personnaliser votre profil',
+        // Watched movies
+        mark_as_watched: 'Marquer comme vu',
+        watched_movies: 'Films Vus',
+        profile_watched: 'Vus',
+        profile_no_watched: 'Vous n\'avez marqué aucun film comme vu.',
+        remove_from_watched: 'Retirer des films vus'
     },
     'de': {
         nav_movies: 'Filme',
@@ -729,7 +747,13 @@ const TRANSLATIONS = {
         profile_upcoming: 'Demnächst auf meiner Liste',
         profile_no_upcoming: 'Es gibt keine bevorstehenden Filme auf Ihrer Watchlist.',
         profile_choose_avatar: 'Wählen Sie Ihren Avatar',
-        profile_avatar_subtitle: 'Wählen Sie ein Symbol, um Ihr Profil anzupassen'
+        profile_avatar_subtitle: 'Wählen Sie ein Symbol, um Ihr Profil anzupassen',
+        // Watched movies
+        mark_as_watched: 'Als gesehen markieren',
+        watched_movies: 'Gesehene Filme',
+        profile_watched: 'Gesehen',
+        profile_no_watched: 'Sie haben keine Filme als gesehen markiert.',
+        remove_from_watched: 'Von gesehen entfernen'
     }
 };
 
@@ -833,6 +857,9 @@ function createMovieCard(item, type = 'movie') {
     // Check if item is in favorites
     const currentUser = getCurrentUser();
     const isFavorite = currentUser && currentUser.favorites && currentUser.favorites.includes(id);
+    
+    // Check if item is in watched list
+    const isWatched = currentUser && currentUser.watchedMovies && currentUser.watchedMovies.includes(id);
 
     const card = document.createElement('div');
     card.classList.add('card');
@@ -843,8 +870,11 @@ function createMovieCard(item, type = 'movie') {
     card.innerHTML = `
         <div class="image-content">
             <img src="${IMAGE_URL + poster_path}" alt="${title}" loading="lazy">
-            <button class="favorite-btn ${isFavorite ? 'favorite-active' : ''}" data-movie-id="${id}" aria-label="Agregar a favoritos">
+            <button class="favorite-btn ${isFavorite ? 'favorite-active' : ''}" data-movie-id="${id}" aria-label="${getTranslation('section_favorites')}">
                 <i class="fas fa-heart"></i>
+            </button>
+            <button class="watched-btn ${isWatched ? 'watched-active' : ''}" data-movie-id="${id}" aria-label="${getTranslation('mark_as_watched')}">
+                <i class="fas fa-eye"></i>
             </button>
             <div class="options-icon" aria-label="Opciones">
                 <i class="fas fa-ellipsis-h"></i>
@@ -864,6 +894,13 @@ function createMovieCard(item, type = 'movie') {
     favoriteBtn.addEventListener('click', (e) => {
         e.stopPropagation(); // Prevent card click event
         toggleFavorite(id);
+    });
+    
+    // Add click event to watched button
+    const watchedBtn = card.querySelector('.watched-btn');
+    watchedBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent card click event
+        toggleWatched(id, type);
     });
 
     // Add click event to open details
@@ -2438,6 +2475,78 @@ async function toggleFavorite(movieId) {
     } catch (error) {
         console.error('Error toggling favorite:', error);
         showToast('Hubo un error al actualizar los favoritos. Por favor, verifica que json-server esté ejecutándose.', 'error');
+    }
+}
+
+/**
+ * Toggle watched status for a movie/TV show
+ */
+async function toggleWatched(movieId, type = 'movie') {
+    const currentUser = getCurrentUser();
+    
+    // Check if user is logged in
+    if (!currentUser) {
+        showToast(getTranslation('nav_login'), 'warning');
+        setTimeout(() => {
+            window.location.href = 'auth.html';
+        }, 1000);
+        return;
+    }
+    
+    try {
+        // Initialize watchedMovies array if it doesn't exist
+        if (!currentUser.watchedMovies) {
+            currentUser.watchedMovies = [];
+        }
+        
+        // Check if movie is already in watched list
+        const watchedIndex = currentUser.watchedMovies.findIndex(item => item.id === movieId);
+        let updatedWatched;
+        
+        if (watchedIndex > -1) {
+            // Remove from watched
+            updatedWatched = currentUser.watchedMovies.filter(item => item.id !== movieId);
+            showToast(getTranslation('remove_from_watched'), 'success');
+        } else {
+            // Add to watched with timestamp and type
+            updatedWatched = [...currentUser.watchedMovies, { 
+                id: movieId, 
+                type: type,
+                watchedAt: new Date().toISOString() 
+            }];
+            showToast(getTranslation('mark_as_watched'), 'success');
+        }
+        
+        // Update user in json-server
+        const response = await fetch(`http://localhost:3000/usuarios/${currentUser.id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ watchedMovies: updatedWatched })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Error al actualizar películas vistas');
+        }
+        
+        // Update localStorage
+        currentUser.watchedMovies = updatedWatched;
+        updateCurrentUser(currentUser);
+        
+        // Update UI - find all watched buttons for this movie and update them
+        const watchedButtons = document.querySelectorAll(`.watched-btn[data-movie-id="${movieId}"]`);
+        watchedButtons.forEach(btn => {
+            if (watchedIndex > -1) {
+                btn.classList.remove('watched-active');
+            } else {
+                btn.classList.add('watched-active');
+            }
+        });
+        
+    } catch (error) {
+        console.error('Error toggling watched:', error);
+        showToast('Hubo un error al actualizar las películas vistas. Por favor, verifica que json-server esté ejecutándose.', 'error');
     }
 }
 
