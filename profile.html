@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - TMDB</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="auth-styles.css">
+    <link rel="stylesheet" href="profile-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <nav class="navbar" role="navigation" aria-label="Navegación principal">
+        <div class="nav-wrapper">
+            <div class="nav-left">
+                <a href="index.html" class="nav-logo" aria-label="TMDB Inicio">TMDB</a>
+                <ul class="nav-links">
+                    <li class="dropdown">
+                        <a href="#" class="nav-link">Películas</a>
+                        <div class="dropdown-content">
+                            <a href="#" data-type="movie" data-category="popular">Popular</a>
+                            <a href="#" data-type="movie" data-category="now_playing">En cartelera</a>
+                            <a href="#" data-type="movie" data-category="upcoming">Próximamente</a>
+                            <a href="#" data-type="movie" data-category="top_rated">Mejor puntuadas</a>
+                        </div>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="nav-link">Series</a>
+                        <div class="dropdown-content">
+                            <a href="#" data-type="tv" data-category="popular">Popular</a>
+                            <a href="#" data-type="tv" data-category="airing_today">En emisión hoy</a>
+                            <a href="#" data-type="tv" data-category="on_the_air">En televisión</a>
+                            <a href="#" data-type="tv" data-category="top_rated">Mejor puntuadas</a>
+                        </div>
+                    </li>
+                    <li><a href="#" class="nav-link">Gente</a></li>
+                    <li><a href="#" class="nav-link">Más</a></li>
+                </ul>
+            </div>
+            <div class="nav-right">
+                <button id="favorites-toggle-btn" class="icon-btn" style="display: none;" aria-label="Mis Favoritos">
+                    <i class="fas fa-heart"></i>
+                </button>
+                <button class="icon-btn" aria-label="Añadir"><i class="fas fa-plus"></i></button>
+                <div class="lang-box" role="button" tabindex="0" aria-label="Cambiar idioma">ES</div>
+                <a href="auth.html" class="nav-link">Iniciar sesión</a>
+                <a href="auth.html" class="nav-link btn-join">Únete a TMDB</a>
+                <button class="icon-btn search-icon-nav" aria-label="Buscar"><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="profile-main">
+        <div class="profile-container">
+            <!-- Profile Header -->
+            <div class="profile-header">
+                <div class="profile-header-content">
+                    <div class="profile-avatar-large" id="profile-avatar">
+                        <span id="avatar-letter">U</span>
+                    </div>
+                    <div class="profile-header-info">
+                        <h1 id="profile-name">Usuario</h1>
+                        <p class="profile-member-since">
+                            <i class="fas fa-calendar-alt"></i>
+                            Miembro desde <span id="member-since-date">2025</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Content -->
+            <div class="profile-content">
+                <!-- Left Sidebar -->
+                <aside class="profile-sidebar">
+                    <div class="profile-card">
+                        <h3><i class="fas fa-chart-bar"></i> Estadísticas</h3>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-value" id="total-favorites">0</div>
+                                <div class="stat-label">Favoritos</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="total-ratings">0</div>
+                                <div class="stat-label">Valoraciones</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-card">
+                        <h3><i class="fas fa-star"></i> Media Puntuaciones</h3>
+                        <div class="rating-info">
+                            <div class="rating-item">
+                                <span class="rating-label">Películas</span>
+                                <div class="rating-bar">
+                                    <div class="rating-fill" id="movie-rating-fill" style="width: 0%"></div>
+                                </div>
+                                <span class="rating-value" id="movie-rating">0.0</span>
+                            </div>
+                            <div class="rating-item">
+                                <span class="rating-label">Series</span>
+                                <div class="rating-bar">
+                                    <div class="rating-fill" id="tv-rating-fill" style="width: 0%"></div>
+                                </div>
+                                <span class="rating-value" id="tv-rating">0.0</span>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Main Content -->
+                <div class="profile-main-content">
+                    <!-- Favorites Section -->
+                    <section class="profile-section">
+                        <div class="section-header">
+                            <h2><i class="fas fa-heart"></i> Mis Favoritos</h2>
+                            <a href="index.html#favorites" class="see-all-link">Ver todos</a>
+                        </div>
+                        <div id="profile-favorites-container" class="profile-movies-grid">
+                            <div class="empty-state">
+                                <i class="fas fa-heart"></i>
+                                <p>No tienes películas favoritas aún.</p>
+                                <a href="index.html" class="btn-primary-small">Explorar películas</a>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Activity Section -->
+                    <section class="profile-section">
+                        <div class="section-header">
+                            <h2><i class="fas fa-clock"></i> Actividad Reciente</h2>
+                        </div>
+                        <div class="activity-list">
+                            <div class="empty-state">
+                                <i class="fas fa-clipboard-list"></i>
+                                <p>No has registrado ninguna actividad recientemente.</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Upcoming Watchlist -->
+                    <section class="profile-section">
+                        <div class="section-header">
+                            <h2><i class="fas fa-bookmark"></i> Próximamente en Mi Lista</h2>
+                        </div>
+                        <div class="empty-state">
+                            <i class="fas fa-bookmark"></i>
+                            <p>No hay próximas películas en tu lista de seguimiento.</p>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer" role="contentinfo">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>TMDB</h3>
+                <ul>
+                    <li><a href="#">Acerca de TMDB</a></li>
+                    <li><a href="#">Contactar con el soporte</a></li>
+                    <li><a href="#">API</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Participa</h3>
+                <ul>
+                    <li><a href="#">Foros de discusión</a></li>
+                    <li><a href="#">Contribuir</a></li>
+                    <li><a href="#">Guía de contribución</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Comunidad</h3>
+                <ul>
+                    <li><a href="#">Directrices</a></li>
+                    <li><a href="#">Twitter</a></li>
+                    <li><a href="#">Facebook</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Legal</h3>
+                <ul>
+                    <li><a href="#">Términos de uso</a></li>
+                    <li><a href="#">Política de privacidad</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 TMDB. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+    <script src="profile.js"></script>
+</body>
+</html>
