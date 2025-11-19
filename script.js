@@ -1257,7 +1257,7 @@ function toggleFavoritesSection() {
  * Initialize the application
  */
 function init() {
-    console.log('Initializing TMDB application...');
+    console.log('Initializing PFHR application...');
     
     // Setup event handlers
     setupToggleSelectors();
