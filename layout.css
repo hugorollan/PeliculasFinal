@@ -108,6 +108,9 @@ body {
     position: relative;
     transition: color var(--transition-speed);
     display: block;
+    min-width: fit-content;
+    text-align: center;
+    white-space: nowrap;
 }
 
 .nav-link::after {
@@ -138,6 +141,11 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: all var(--transition-speed);
+    min-width: 40px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .lang-box:hover, 
@@ -1036,6 +1044,13 @@ main {
 
     .nav-link {
         font-size: 0.85rem;
+    }
+    
+    .nav-right .nav-link[data-i18n="nav_login"],
+    .nav-right .nav-link[data-i18n="nav_join"] {
+        min-width: auto;
+        text-align: center;
+        padding: 6px 12px;
     }
 
     .hero h1 {

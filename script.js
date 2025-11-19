@@ -2215,6 +2215,9 @@ function showLanguageNotification(lang) {
         z-index: 10001;
         font-weight: 600;
         animation: slideInRight 0.3s ease-out;
+        min-width: 200px;
+        text-align: center;
+        white-space: nowrap;
     `;
     notification.textContent = langMessages[lang] || langMessages['es'];
     
