@@ -19,7 +19,7 @@
                 <a href="index.html" class="nav-logo" aria-label="PFHR Inicio">PFHR</a>
                 <ul class="nav-links">
                     <li class="dropdown">
-                        <a href="#" class="nav-link">Películas</a>
+                        <a href="#" class="nav-link" data-i18n="nav_movies">Películas</a>
                         <div class="dropdown-content">
                             <a href="#" data-type="movie" data-category="popular">Popular</a>
                             <a href="#" data-type="movie" data-category="now_playing">En cartelera</a>
@@ -28,7 +28,7 @@
                         </div>
                     </li>
                     <li class="dropdown">
-                        <a href="#" class="nav-link">Series</a>
+                        <a href="#" class="nav-link" data-i18n="nav_series">Series</a>
                         <div class="dropdown-content">
                             <a href="#" data-type="tv" data-category="popular">Popular</a>
                             <a href="#" data-type="tv" data-category="airing_today">En emisión hoy</a>
@@ -37,13 +37,13 @@
                         </div>
                     </li>
                     <li class="dropdown">
-                        <a href="#" class="nav-link">Gente</a>
+                        <a href="#" class="nav-link" data-i18n="nav_people">Gente</a>
                         <div class="dropdown-content">
                             <a href="#" data-type="person" data-category="popular">Popular</a>
                         </div>
                     </li>
                     <li class="dropdown">
-                        <a href="#" class="nav-link">Más</a>
+                        <a href="#" class="nav-link" data-i18n="nav_more">Más</a>
                         <div class="dropdown-content">
                             <a href="#">Debates</a>
                             <a href="#">Tabla de clasificación</a>
@@ -71,8 +71,8 @@
                         <a href="#" data-lang="de">🇩🇪 Deutsch</a>
                     </div>
                 </div>
-                <a href="auth.html" class="nav-link">Iniciar sesión</a>
-                <a href="auth.html" class="nav-link btn-join">Únete a PFHR</a>
+                <a href="auth.html" class="nav-link" data-i18n="nav_login">Iniciar sesión</a>
+                <a href="auth.html" class="nav-link btn-join" data-i18n="nav_join">Únete a PFHR</a>
                 <button class="icon-btn search-icon-nav" id="search-toggle-btn" aria-label="Buscar"><i class="fas fa-search"></i></button>
             </div>
         </div>
@@ -87,6 +87,7 @@
                         id="nav-search-input" 
                         class="nav-search-input" 
                         placeholder="Buscar una película, serie, persona..."
+                        data-i18n-placeholder="search_placeholder"
                         autocomplete="off">
                 </div>
                 <div class="search-trends" id="search-trends">
@@ -99,8 +100,8 @@
 
     <header class="hero" role="banner">
         <div class="hero-content">
-            <h1>Te damos la bienvenida.</h1>
-            <p class="hero-subtitle">Millones de películas, series y gente por descubrir. Explora ya.</p>
+            <h1 data-i18n="hero_title">Te damos la bienvenida.</h1>
+            <p class="hero-subtitle" data-i18n="hero_subtitle">Millones de películas, series y gente por descubrir. Explora ya.</p>
             
             <div class="search-box">
                 <form id="search-form" role="search">
@@ -108,9 +109,10 @@
                         type="search" 
                         id="search-input" 
                         placeholder="Buscar una película, serie, persona......"
+                        data-i18n-placeholder="search_placeholder"
                         aria-label="Buscar películas, series o personas"
                         autocomplete="off">
-                    <button type="submit" aria-label="Buscar">Buscar</button>
+                    <button type="submit" aria-label="Buscar" data-i18n="search_btn">Buscar</button>
                 </form>
             </div>
         </div>
@@ -120,14 +122,14 @@
         <!-- Favorites Section -->
         <section class="favorites-section" id="favorites-section" style="display: none;" aria-labelledby="favorites-title">
             <div class="section-header">
-                <h2 id="favorites-title">Mis Favoritos</h2>
+                <h2 id="favorites-title" data-i18n="section_favorites">Mis Favoritos</h2>
             </div>
 
             <div class="scroller-wrapper">
                 <div id="favorites-container" class="scroller" role="region"></div>
                 <div id="favorites-empty" class="empty-favorites" style="display: none;">
                     <i class="fas fa-heart"></i>
-                    <p>No tienes películas favoritas aún.</p>
+                    <p data-i18n="empty_favorites">No tienes películas favoritas aún.</p>
                     <p class="empty-subtitle">¡Comienza a agregar películas a tu lista!</p>
                 </div>
             </div>
@@ -135,14 +137,15 @@
 
         <section class="trending-section" aria-labelledby="trending-title">
             <div class="section-header">
-                <h2 id="trending-title">Tendencias</h2>
+                <h2 id="trending-title" data-i18n="section_trending">Tendencias</h2>
                 <div class="toggle-selector" role="tablist" aria-label="Filtro de tendencias">
                     <button 
                         class="toggle-item active" 
                         data-time="day" 
                         role="tab" 
                         aria-selected="true"
-                        aria-controls="trending-container">
+                        aria-controls="trending-container"
+                        data-i18n="time_day">
                         Hoy
                     </button>
                     <button 
@@ -150,7 +153,8 @@
                         data-time="week" 
                         role="tab" 
                         aria-selected="false"
-                        aria-controls="trending-container">
+                        aria-controls="trending-container"
+                        data-i18n="time_week">
                         Esta semana
                     </button>
                 </div>
@@ -171,14 +175,15 @@
 
         <section class="popular-section" aria-labelledby="popular-title">
             <div class="section-header">
-                <h2 id="popular-title">Populares</h2>
+                <h2 id="popular-title" data-i18n="section_popular">Populares</h2>
                 <div class="toggle-selector" role="tablist" aria-label="Filtro de populares">
                     <button 
                         class="toggle-item active" 
                         data-category="streaming" 
                         role="tab" 
                         aria-selected="true"
-                        aria-controls="popular-container">
+                        aria-controls="popular-container"
+                        data-i18n="cat_streaming">
                         Streaming
                     </button>
                     <button 
@@ -186,7 +191,8 @@
                         data-category="tv" 
                         role="tab" 
                         aria-selected="false"
-                        aria-controls="popular-container">
+                        aria-controls="popular-container"
+                        data-i18n="cat_tv">
                         En TV
                     </button>
                     <button 
@@ -194,7 +200,8 @@
                         data-category="rent" 
                         role="tab" 
                         aria-selected="false"
-                        aria-controls="popular-container">
+                        aria-controls="popular-container"
+                        data-i18n="cat_rent">
                         En Alquiler
                     </button>
                     <button 
@@ -202,7 +209,8 @@
                         data-category="theaters" 
                         role="tab" 
                         aria-selected="false"
-                        aria-controls="popular-container">
+                        aria-controls="popular-container"
+                        data-i18n="cat_theaters">
                         En Cines
                     </button>
                 </div>
@@ -215,14 +223,15 @@
 
         <section class="latest-trailers-section" aria-labelledby="trailers-title">
             <div class="section-header">
-                <h2 id="trailers-title">Últimos Tráilers</h2>
+                <h2 id="trailers-title" data-i18n="section_trailers">Últimos Tráilers</h2>
                 <div class="toggle-selector" role="tablist" aria-label="Filtro de tráilers">
                     <button 
                         class="toggle-item active" 
                         data-trailer="streaming" 
                         role="tab" 
                         aria-selected="true"
-                        aria-controls="trailers-container">
+                        aria-controls="trailers-container"
+                        data-i18n="cat_streaming">
                         Streaming
                     </button>
                     <button 
@@ -230,7 +239,8 @@
                         data-trailer="tv" 
                         role="tab" 
                         aria-selected="false"
-                        aria-controls="trailers-container">
+                        aria-controls="trailers-container"
+                        data-i18n="cat_tv">
                         En TV
                     </button>
                     <button 
@@ -238,7 +248,8 @@
                         data-trailer="rent" 
                         role="tab" 
                         aria-selected="false"
-                        aria-controls="trailers-container">
+                        aria-controls="trailers-container"
+                        data-i18n="cat_rent">
                         En Alquiler
                     </button>
                     <button 
@@ -246,7 +257,8 @@
                         data-trailer="theaters" 
                         role="tab" 
                         aria-selected="false"
-                        aria-controls="trailers-container">
+                        aria-controls="trailers-container"
+                        data-i18n="cat_theaters">
                         En Cines
                     </button>
                 </div>

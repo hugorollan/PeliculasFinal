@@ -7,6 +7,59 @@ const BACKDROP_URL = 'https://image.tmdb.org/t/p/w780';
 // YouTube video ID validation regex (11 characters, alphanumeric with _ and -)
 const YOUTUBE_VIDEO_ID_REGEX = /^[a-zA-Z0-9_-]{11}$/;
 
+// Diccionario de Traducciones
+const TRANSLATIONS = {
+    'es': {
+        nav_movies: 'Películas',
+        nav_series: 'Series',
+        nav_people: 'Gente',
+        nav_more: 'Más',
+        nav_login: 'Iniciar sesión',
+        nav_join: 'Únete a PFHR',
+        hero_title: 'Te damos la bienvenida.',
+        hero_subtitle: 'Millones de películas, series y gente por descubrir. Explora ya.',
+        search_btn: 'Buscar',
+        search_placeholder: 'Buscar una película, serie, persona...',
+        section_favorites: 'Mis Favoritos',
+        section_trending: 'Tendencias',
+        section_popular: 'Populares',
+        section_trailers: 'Últimos Tráilers',
+        time_day: 'Hoy',
+        time_week: 'Esta semana',
+        cat_streaming: 'Streaming',
+        cat_tv: 'En TV',
+        cat_rent: 'En Alquiler',
+        cat_theaters: 'En Cines',
+        empty_favorites: 'No tienes películas favoritas aún.'
+    },
+    'en': {
+        nav_movies: 'Movies',
+        nav_series: 'TV Shows',
+        nav_people: 'People',
+        nav_more: 'More',
+        nav_login: 'Login',
+        nav_join: 'Join PFHR',
+        hero_title: 'Welcome.',
+        hero_subtitle: 'Millions of movies, TV shows and people to discover. Explore now.',
+        search_btn: 'Search',
+        search_placeholder: 'Search for a movie, tv show, person...',
+        section_favorites: 'My Favorites',
+        section_trending: 'Trending',
+        section_popular: 'Popular',
+        section_trailers: 'Latest Trailers',
+        time_day: 'Today',
+        time_week: 'This Week',
+        cat_streaming: 'Streaming',
+        cat_tv: 'On TV',
+        cat_rent: 'For Rent',
+        cat_theaters: 'In Theaters',
+        empty_favorites: 'You haven\'t added any favorites yet.'
+    }
+};
+
+// Variable global de idioma (la API usa formato 'es-ES', 'en-US')
+let currentApiLang = 'es-ES';
+
 // DOM Elements
 const trendingContainer = document.getElementById('trending-container');
 const popularContainer = document.getElementById('popular-container');
@@ -210,7 +263,7 @@ function createTrailerCard(movie) {
  * Fetch content by type (movie/tv) and category
  */
 async function getContentByCategory(type = 'movie', category = 'popular', container = trendingContainer) {
-    const url = `${BASE_URL}/${type}/${category}?language=es-ES&page=1`;
+    const url = `${BASE_URL}/${type}/${category}?language=${currentApiLang}&page=1`;
     
     try {
         showLoading();
@@ -272,7 +325,7 @@ function updateSectionTitle(type, category) {
  * Fetch trending movies
  */
 async function getTrendingMovies(timeWindow = 'day') {
-    const url = `${BASE_URL}/trending/movie/${timeWindow}?language=es-ES`;
+    const url = `${BASE_URL}/trending/movie/${timeWindow}?language=${currentApiLang}`;
     
     try {
         showLoading();
@@ -295,7 +348,7 @@ async function getTrendingMovies(timeWindow = 'day') {
  * Fetch popular movies
  */
 async function getPopularMovies() {
-    const url = `${BASE_URL}/movie/popular?language=es-ES&page=1`;
+    const url = `${BASE_URL}/movie/popular?language=${currentApiLang}&page=1`;
     
     try {
         const res = await fetch(url, options);
@@ -315,7 +368,7 @@ async function getPopularMovies() {
  * Fetch movies for trailers section
  */
 async function getUpcomingMovies() {
-    const url = `${BASE_URL}/movie/upcoming?language=es-ES&page=1`;
+    const url = `${BASE_URL}/movie/upcoming?language=${currentApiLang}&page=1`;
     
     try {
         const res = await fetch(url, options);
@@ -338,7 +391,7 @@ async function searchMovies(query) {
     if (!query.trim()) return;
     
     // Use multi search to find both movies and TV shows
-    const url = `${BASE_URL}/search/multi?language=es-ES&query=${encodeURIComponent(query)}&page=1`;
+    const url = `${BASE_URL}/search/multi?language=${currentApiLang}&query=${encodeURIComponent(query)}&page=1`;
     
     try {
         showLoading();
@@ -386,7 +439,7 @@ async function searchMovies(query) {
  * Search movies by keyword
  */
 async function searchMoviesByKeyword(keywordId, keywordName) {
-    const url = `${BASE_URL}/discover/movie?language=es-ES&with_keywords=${keywordId}&sort_by=popularity.desc&page=1`;
+    const url = `${BASE_URL}/discover/movie?language=${currentApiLang}&with_keywords=${keywordId}&sort_by=popularity.desc&page=1`;
     
     try {
         showLoading();
@@ -698,7 +751,7 @@ function setupNavbarSearch() {
         try {
             searchTrendsList.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-secondary);">Cargando tendencias...</div>';
             
-            const url = `${BASE_URL}/trending/all/day?language=es-ES`;
+            const url = `${BASE_URL}/trending/all/day?language=${currentApiLang}`;
             const res = await fetch(url, options);
             
             if (!res.ok) throw new Error('Error loading trends');
@@ -749,7 +802,7 @@ function setupNavbarSearch() {
         if (!searchTrendsList) return;
         
         try {
-            const url = `${BASE_URL}/search/multi?language=es-ES&query=${encodeURIComponent(query)}&page=1`;
+            const url = `${BASE_URL}/search/multi?language=${currentApiLang}&query=${encodeURIComponent(query)}&page=1`;
             const res = await fetch(url, options);
             
             if (!res.ok) throw new Error('Error searching');
@@ -912,7 +965,7 @@ function closeMovieDetails() {
  * Fetch movie details
  */
 async function fetchMovieDetails(movieId, type = 'movie') {
-    const url = `${BASE_URL}/${type}/${movieId}?language=es-ES`;
+    const url = `${BASE_URL}/${type}/${movieId}?language=${currentApiLang}`;
     const res = await fetch(url, options);
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     return await res.json();
@@ -922,7 +975,7 @@ async function fetchMovieDetails(movieId, type = 'movie') {
  * Fetch movie credits
  */
 async function fetchMovieCredits(movieId, type = 'movie') {
-    const url = `${BASE_URL}/${type}/${movieId}/credits?language=es-ES`;
+    const url = `${BASE_URL}/${type}/${movieId}/credits?language=${currentApiLang}`;
     const res = await fetch(url, options);
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     return await res.json();
@@ -932,7 +985,7 @@ async function fetchMovieCredits(movieId, type = 'movie') {
  * Fetch movie reviews
  */
 async function fetchMovieReviews(movieId, type = 'movie') {
-    const url = `${BASE_URL}/${type}/${movieId}/reviews?language=es-ES&page=1`;
+    const url = `${BASE_URL}/${type}/${movieId}/reviews?language=${currentApiLang}&page=1`;
     const res = await fetch(url, options);
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     return await res.json();
@@ -942,7 +995,7 @@ async function fetchMovieReviews(movieId, type = 'movie') {
  * Fetch movie videos
  */
 async function fetchMovieVideos(movieId, type = 'movie') {
-    const url = `${BASE_URL}/${type}/${movieId}/videos?language=es-ES`;
+    const url = `${BASE_URL}/${type}/${movieId}/videos?language=${currentApiLang}`;
     const res = await fetch(url, options);
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     return await res.json();
@@ -952,7 +1005,7 @@ async function fetchMovieVideos(movieId, type = 'movie') {
  * Fetch movie recommendations
  */
 async function fetchMovieRecommendations(movieId, type = 'movie') {
-    const url = `${BASE_URL}/${type}/${movieId}/recommendations?language=es-ES&page=1`;
+    const url = `${BASE_URL}/${type}/${movieId}/recommendations?language=${currentApiLang}&page=1`;
     const res = await fetch(url, options);
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     return await res.json();
@@ -1385,7 +1438,7 @@ async function loadFavorites() {
         
         // Fetch details for all favorite movies
         const moviePromises = currentUser.favorites.map(movieId => 
-            fetch(`${BASE_URL}/movie/${movieId}?language=es-ES`, options)
+            fetch(`${BASE_URL}/movie/${movieId}?language=${currentApiLang}`, options)
                 .then(res => res.ok ? res.json() : null)
         );
         
@@ -1867,15 +1920,15 @@ function setupLanguageSelector() {
 }
 
 /**
- * Change language
+ * Change language and update UI
  */
 function changeLanguage(lang) {
     const langBox = document.querySelector('.lang-box');
     
-    // Store language preference
+    // 1. Guardar preferencia
     localStorage.setItem('preferredLanguage', lang);
     
-    // Update language box text
+    // 2. Actualizar botón visual
     const langMap = {
         'es': 'ES',
         'en': 'EN',
@@ -1887,10 +1940,33 @@ function changeLanguage(lang) {
         langBox.textContent = langMap[lang] || 'ES';
     }
     
-    // In a real application, you would translate the entire UI here
-    console.log(`Language changed to: ${lang}`);
+    // 3. Definir idioma para la API (Mapeo simple)
+    // Si es 'en', usa 'en-US', si no, 'es-ES'
+    currentApiLang = lang === 'en' ? 'en-US' : 'es-ES';
     
-    // Show a notification
+    // 4. Traducir la Interfaz (UI)
+    const texts = TRANSLATIONS[lang];
+    if (texts) {
+        // Traducir textos normales
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (texts[key]) el.textContent = texts[key];
+        });
+        
+        // Traducir placeholders (inputs)
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+            const key = el.getAttribute('data-i18n-placeholder');
+            if (texts[key]) el.placeholder = texts[key];
+        });
+    }
+    
+    // 5. Recargar contenido de la API con el nuevo idioma
+    console.log(`Reloading content in: ${currentApiLang}`);
+    getTrendingMovies(currentTrendingTime);
+    getPopularMovies();
+    getUpcomingMovies();
+    
+    // Notificación
     showLanguageNotification(lang);
 }
 
@@ -1934,20 +2010,8 @@ function showLanguageNotification(lang) {
  * Load saved language preference
  */
 function loadLanguagePreference() {
-    const savedLang = localStorage.getItem('preferredLanguage');
-    if (savedLang) {
-        const langBox = document.querySelector('.lang-box');
-        const langMap = {
-            'es': 'ES',
-            'en': 'EN',
-            'fr': 'FR',
-            'de': 'DE'
-        };
-        
-        if (langBox) {
-            langBox.textContent = langMap[savedLang] || 'ES';
-        }
-    }
+    const savedLang = localStorage.getItem('preferredLanguage') || 'es';
+    changeLanguage(savedLang);
 }
 
 // Start the application when DOM is ready
