@@ -887,7 +887,7 @@ function setupNavigationDropdowns() {
             } else {
                 // Handle "Más" menu items without data attributes
                 const linkText = link.textContent.trim();
-                alert(`${linkText} - Próximamente`);
+                // Removed alert message
             }
         });
     });
@@ -1931,9 +1931,7 @@ function changeLanguage(lang) {
     // 2. Actualizar botón visual
     const langMap = {
         'es': 'ES',
-        'en': 'EN',
-        'fr': 'FR',
-        'de': 'DE'
+        'en': 'EN'
     };
     
     if (langBox) {
@@ -1976,9 +1974,7 @@ function changeLanguage(lang) {
 function showLanguageNotification(lang) {
     const langNames = {
         'es': 'Español',
-        'en': 'English',
-        'fr': 'Français',
-        'de': 'Deutsch'
+        'en': 'English'
     };
     
     const notification = document.createElement('div');
