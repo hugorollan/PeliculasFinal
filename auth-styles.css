@@ -182,11 +182,14 @@
 .user-profile {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
     color: var(--tmdb-white);
     font-size: 0.9rem;
     flex-wrap: nowrap;
     white-space: nowrap;
+    padding-left: 15px;
+    margin-left: 15px;
+    border-left: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .user-avatar {
@@ -222,7 +225,7 @@
 
 .user-name {
     font-weight: 600;
-    max-width: 120px;
+    max-width: 100px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -232,7 +235,7 @@
     background: transparent;
     border: 1px solid var(--tmdb-white);
     color: var(--tmdb-white);
-    padding: 5px 12px;
+    padding: 5px 8px;
     border-radius: 4px;
     font-size: 0.85rem;
     font-weight: 600;
@@ -240,11 +243,25 @@
     transition: all var(--transition-speed);
     flex-shrink: 0;
     white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .btn-logout:hover {
     background: var(--tmdb-white);
     color: var(--tmdb-dark-blue);
+}
+
+.btn-logout .logout-text {
+    font-size: 0;
+}
+
+/* Show full text on wider screens */
+@media (min-width: 1200px) {
+    .btn-logout .logout-text {
+        font-size: 0.85rem;
+    }
 }
 
 /* Responsive adjustments for user profile */
