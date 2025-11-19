@@ -897,6 +897,9 @@ function closeMovieDetails() {
     if (movieModal) {
         movieModal.style.display = 'none';
         document.body.style.overflow = '';
+        
+        // Clear hash from URL
+        window.history.pushState("", document.title, window.location.pathname + window.location.search);
     }
 }
 
@@ -1449,7 +1452,28 @@ function init() {
     getPopularMovies();
     getUpcomingMovies();
     
+    // Handle deep linking - check if URL has a movie hash
+    handleDeepLinking();
+    
     console.log('Application initialized successfully!');
+}
+
+/**
+ * Handle deep linking from URL hash
+ */
+function handleDeepLinking() {
+    const hash = window.location.hash;
+    
+    // Check if hash matches pattern #movie-{id}
+    if (hash && hash.startsWith('#movie-')) {
+        const movieId = hash.replace('#movie-', '');
+        
+        // Validate that we have a valid numeric ID
+        if (movieId && !isNaN(movieId)) {
+            // Open movie details automatically
+            openMovieDetails(movieId, 'movie');
+        }
+    }
 }
 
 /**
@@ -1653,7 +1677,7 @@ function closeSupportModal() {
 /**
  * Handle support form submission
  */
-function handleSupportFormSubmit(e) {
+async function handleSupportFormSubmit(e) {
     const supportForm = document.getElementById('support-form');
     const supportSuccess = document.getElementById('support-success');
     
@@ -1664,24 +1688,38 @@ function handleSupportFormSubmit(e) {
         reason: document.getElementById('support-reason').value,
         subject: document.getElementById('support-subject').value,
         message: document.getElementById('support-message').value,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        status: 'open'
     };
     
-    // Log to console (in a real app, this would be sent to a server)
-    console.log('Support form submitted:', formData);
-    
-    // Show success message
-    if (supportForm && supportSuccess) {
-        supportForm.style.display = 'none';
-        supportSuccess.style.display = 'block';
+    try {
+        // Send ticket data to json-server
+        const response = await fetch('http://localhost:3000/tickets', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Error al enviar el ticket: ${response.status}`);
+        }
+        
+        // Success - show success message
+        if (supportForm && supportSuccess) {
+            supportForm.style.display = 'none';
+            supportSuccess.style.display = 'block';
+        }
+        
+        console.log('Support ticket submitted successfully:', formData);
+        
+    } catch (error) {
+        console.error('Error submitting support ticket:', error);
+        
+        // Show error alert to user
+        alert('Hubo un error al enviar tu solicitud de soporte. Por favor, verifica que el servidor esté ejecutándose (json-server) e intenta de nuevo.');
     }
-    
-    // In a real application, you would send this data to a server:
-    // fetch('/api/support', {
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify(formData)
-    // });
 }
 
 // Start the application when DOM is ready

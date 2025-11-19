@@ -20,5 +20,17 @@
       "favorites": [],
       "id": 2
     }
+  ],
+  "tickets": [
+    {
+      "name": "Test User",
+      "email": "test@example.com",
+      "reason": "technical",
+      "subject": "Testing support system",
+      "message": "This is a test ticket to verify the support system works correctly.",
+      "timestamp": "2025-11-19T15:45:00.000Z",
+      "status": "open",
+      "id": 1
+    }
   ]
 }
