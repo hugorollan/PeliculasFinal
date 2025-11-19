@@ -1,9 +1,3 @@
-// API Configuration
-const API_KEY = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzOTgxNWVjZTI4ZjcyNWJlZGRmY2Y3OGE0YzRjZGU0ZiIsIm5iZiI6MTc2MDQ1NjUxNS4xNDcsInN1YiI6IjY4ZWU2ZjQzNDYzMzQ0Yjg0MTlkZjQ3MCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.ejdXz4pm0dZn0OAVJvJ16R8SwNAa-MBkO_yttUiblLk';
-const BASE_URL = 'https://api.themoviedb.org/3';
-const IMAGE_URL = 'https://image.tmdb.org/t/p/w500';
-const BACKDROP_URL = 'https://image.tmdb.org/t/p/w780';
-
 // YouTube video ID validation regex (11 characters, alphanumeric with _ and -)
 const YOUTUBE_VIDEO_ID_REGEX = /^[a-zA-Z0-9_-]{11}$/;
 
@@ -680,27 +674,6 @@ let currentCategory = null; // Track current category being displayed
 // ============ UTILITY FUNCTIONS ============
 
 /**
- * Show loading spinner
- */
-function showLoading() {
-    if (loadingSpinner) {
-        loadingSpinner.classList.remove('hidden');
-    }
-    if (errorMessage) {
-        errorMessage.style.display = 'none';
-    }
-}
-
-/**
- * Hide loading spinner
- */
-function hideLoading() {
-    if (loadingSpinner) {
-        loadingSpinner.classList.add('hidden');
-    }
-}
-
-/**
  * Show error message
  */
 function showError() {
@@ -708,15 +681,6 @@ function showError() {
     if (errorMessage) {
         errorMessage.style.display = 'flex';
     }
-}
-
-/**
- * Format date to Spanish locale
- */
-function formatDate(dateString) {
-    if (!dateString) return 'Fecha desconocida';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 /**
@@ -1945,21 +1909,6 @@ function displayMovieDetails(data) {
 // ============ FAVORITES FUNCTIONS ============
 
 /**
- * Get current user from localStorage (imported from app.js context)
- */
-function getCurrentUser() {
-    const userStr = localStorage.getItem('currentUser');
-    return userStr ? JSON.parse(userStr) : null;
-}
-
-/**
- * Update current user in localStorage
- */
-function updateCurrentUser(user) {
-    localStorage.setItem('currentUser', JSON.stringify(user));
-}
-
-/**
  * Toggle favorite status for a movie
  */
 async function toggleFavorite(movieId) {
@@ -1967,8 +1916,10 @@ async function toggleFavorite(movieId) {
     
     // Check if user is logged in
     if (!currentUser) {
-        alert('Por favor, inicia sesión para agregar películas a favoritos');
-        window.location.href = 'auth.html';
+        showToast('Por favor, inicia sesión para agregar películas a favoritos', 'warning');
+        setTimeout(() => {
+            window.location.href = 'auth.html';
+        }, 1000);
         return;
     }
     
@@ -2025,7 +1976,7 @@ async function toggleFavorite(movieId) {
         
     } catch (error) {
         console.error('Error toggling favorite:', error);
-        alert('Hubo un error al actualizar los favoritos. Por favor, verifica que json-server esté ejecutándose.');
+        showToast('Hubo un error al actualizar los favoritos. Por favor, verifica que json-server esté ejecutándose.', 'error');
     }
 }
 
@@ -2396,8 +2347,8 @@ async function handleSupportFormSubmit(e) {
     } catch (error) {
         console.error('Error submitting support ticket:', error);
         
-        // Show error alert to user
-        alert('Hubo un error al enviar tu solicitud de soporte. Por favor, verifica que el servidor esté ejecutándose (json-server) e intenta de nuevo.');
+        // Show error toast to user
+        showToast('Hubo un error al enviar tu solicitud de soporte. Por favor, verifica que el servidor esté ejecutándose (json-server) e intenta de nuevo.', 'error');
     }
 }
 

@@ -1,10 +1,5 @@
 // Profile Page JavaScript
 
-// API Configuration
-const API_KEY = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzOTgxNWVjZTI4ZjcyNWJlZGRmY2Y3OGE0YzRjZGU0ZiIsIm5iZiI6MTc2MDQ1NjUxNS4xNDcsInN1YiI6IjY4ZWU2ZjQzNDYzMzQ0Yjg0MTlkZjQ3MCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.ejdXz4pm0dZn0OAVJvJ16R8SwNAa-MBkO_yttUiblLk';
-const BASE_URL = 'https://api.themoviedb.org/3';
-const IMAGE_URL = 'https://image.tmdb.org/t/p/w500';
-
 // Request Options
 const options = {
     method: 'GET',
@@ -17,14 +12,6 @@ const options = {
 // ============ UTILITY FUNCTIONS ============
 
 /**
- * Get current user from localStorage
- */
-function getCurrentUser() {
-    const userStr = localStorage.getItem('currentUser');
-    return userStr ? JSON.parse(userStr) : null;
-}
-
-/**
  * Format date to month and year
  */
 function formatMemberSince(dateString) {
@@ -33,15 +20,6 @@ function formatMemberSince(dateString) {
     const months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 
                     'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
     return `${months[date.getMonth()]} de ${date.getFullYear()}`;
-}
-
-/**
- * Format date for display
- */
-function formatDate(dateString) {
-    if (!dateString) return 'Fecha desconocida';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 // ============ PROFILE INITIALIZATION ============
