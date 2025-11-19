@@ -130,7 +130,15 @@ const TRANSLATIONS = {
         support_reason_billing: 'Consulta sobre facturación',
         support_reason_other: 'Otro',
         support_submit_btn: 'Enviar consulta',
-        support_cancel_btn: 'Cancelar'
+        support_cancel_btn: 'Cancelar',
+        // Project info modal
+        project_info_link: 'Pulse para más información del proyecto',
+        project_modal_title: 'Información del Proyecto',
+        project_designer_title: 'Diseñador del Proyecto',
+        project_designer_name: 'Hugo Rollán Agudo',
+        project_linkedin: 'LinkedIn',
+        project_instagram: 'Instagram',
+        project_error_loading: 'Error al cargar la información del proyecto.'
     },
     'en': {
         nav_movies: 'Movies',
@@ -253,7 +261,15 @@ const TRANSLATIONS = {
         support_reason_billing: 'Billing inquiry',
         support_reason_other: 'Other',
         support_submit_btn: 'Submit inquiry',
-        support_cancel_btn: 'Cancel'
+        support_cancel_btn: 'Cancel',
+        // Project info modal
+        project_info_link: 'Click for more project information',
+        project_modal_title: 'Project Information',
+        project_designer_title: 'Project Designer',
+        project_designer_name: 'Hugo Rollán Agudo',
+        project_linkedin: 'LinkedIn',
+        project_instagram: 'Instagram',
+        project_error_loading: 'Error loading project information.'
     }
 };
 
@@ -2030,17 +2046,26 @@ async function openProjectInfoModal() {
         projectInfoModal.style.display = 'block';
         document.body.style.overflow = 'hidden';
         
-        // Load README content
+        // Load README content based on selected language
         if (readmeContent) {
             try {
-                const response = await fetch('README.md');
+                const lang = localStorage.getItem('preferredLanguage') || 'es';
+                let readmeFile = 'README.md'; // Default Spanish
+                
+                if (lang === 'en') {
+                    readmeFile = 'README-en.md';
+                }
+                
+                const response = await fetch(readmeFile);
                 const markdown = await response.text();
                 
                 // Convert markdown to HTML (simple conversion)
                 readmeContent.innerHTML = convertMarkdownToHTML(markdown);
             } catch (error) {
                 console.error('Error loading README:', error);
-                readmeContent.innerHTML = '<p>Error al cargar la información del proyecto.</p>';
+                const lang = localStorage.getItem('preferredLanguage') || 'es';
+                const errorText = TRANSLATIONS[lang]?.project_error_loading || 'Error al cargar la información del proyecto.';
+                readmeContent.innerHTML = `<p>${errorText}</p>`;
             }
         }
     }
@@ -2172,9 +2197,9 @@ function changeLanguage(lang) {
  * Show language change notification
  */
 function showLanguageNotification(lang) {
-    const langNames = {
-        'es': 'Español',
-        'en': 'English'
+    const langMessages = {
+        'es': 'Idioma: Español🇪🇸',
+        'en': 'Language: English🇬🇧'
     };
     
     const notification = document.createElement('div');
@@ -2191,7 +2216,7 @@ function showLanguageNotification(lang) {
         font-weight: 600;
         animation: slideInRight 0.3s ease-out;
     `;
-    notification.textContent = `Idioma cambiado a: ${langNames[lang]}`;
+    notification.textContent = langMessages[lang] || langMessages['es'];
     
     document.body.appendChild(notification);
     
