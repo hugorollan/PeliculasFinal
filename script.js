@@ -144,6 +144,35 @@ function createMovieCard(item, type = 'movie') {
 }
 
 /**
+ * Create person card element
+ */
+function createPersonCard(person) {
+    const { name, profile_path, known_for_department, id } = person;
+    
+    if (!profile_path) return null; // Skip people without profile photos
+    
+    const card = document.createElement('div');
+    card.classList.add('card');
+    card.setAttribute('data-person-id', id);
+    card.style.cursor = 'pointer';
+    
+    card.innerHTML = `
+        <div class="image-content">
+            <img src="${IMAGE_URL + profile_path}" alt="${name}" loading="lazy">
+            <div class="options-icon" aria-label="Opciones">
+                <i class="fas fa-ellipsis-h"></i>
+            </div>
+        </div>
+        <div class="card-content">
+            <h2 title="${name}">${name}</h2>
+            <p>${known_for_department || 'Actuación'}</p>
+        </div>
+    `;
+
+    return card;
+}
+
+/**
  * Create trailer card element
  */
 function createTrailerCard(movie) {
@@ -192,7 +221,14 @@ async function getContentByCategory(type = 'movie', category = 'popular', contai
         }
         
         const data = await res.json();
-        displayContent(data.results, container, type);
+        
+        // Handle different types of content
+        if (type === 'person') {
+            displayPeople(data.results, container);
+        } else {
+            displayContent(data.results, container, type);
+        }
+        
         hideLoading();
         
         // Update section title based on content type and category
@@ -210,7 +246,14 @@ function updateSectionTitle(type, category) {
     const trendingTitle = document.getElementById('trending-title');
     if (!trendingTitle) return;
     
-    const contentTypeLabel = type === 'movie' ? 'Películas' : 'Series';
+    let contentTypeLabel = '';
+    if (type === 'movie') {
+        contentTypeLabel = 'Películas';
+    } else if (type === 'tv') {
+        contentTypeLabel = 'Series';
+    } else if (type === 'person') {
+        contentTypeLabel = 'Personas';
+    }
     
     const categoryLabels = {
         popular: 'Populares',
@@ -435,6 +478,26 @@ function displayMovies(movies, container) {
 }
 
 /**
+ * Display people in container
+ */
+function displayPeople(people, container) {
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    const fragment = document.createDocumentFragment();
+    
+    people.forEach(person => {
+        const card = createPersonCard(person);
+        if (card) {
+            fragment.appendChild(card);
+        }
+    });
+    
+    container.appendChild(fragment);
+}
+
+/**
  * Display trailers
  */
 function displayTrailers(movies) {
@@ -587,6 +650,10 @@ function setupNavigationDropdowns() {
                     behavior: 'smooth', 
                     block: 'start' 
                 });
+            } else {
+                // Handle "Más" menu items without data attributes
+                const linkText = link.textContent.trim();
+                alert(`${linkText} - Próximamente`);
             }
         });
     });
