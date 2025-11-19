@@ -1,10 +1,5 @@
 // Profile Page JavaScript
 
-// API Configuration
-const API_KEY = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzOTgxNWVjZTI4ZjcyNWJlZGRmY2Y3OGE0YzRjZGU0ZiIsIm5iZiI6MTc2MDQ1NjUxNS4xNDcsInN1YiI6IjY4ZWU2ZjQzNDYzMzQ0Yjg0MTlkZjQ3MCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.ejdXz4pm0dZn0OAVJvJ16R8SwNAa-MBkO_yttUiblLk';
-const BASE_URL = 'https://api.themoviedb.org/3';
-const IMAGE_URL = 'https://image.tmdb.org/t/p/w500';
-
 // Request Options
 const options = {
     method: 'GET',
@@ -17,14 +12,6 @@ const options = {
 // ============ UTILITY FUNCTIONS ============
 
 /**
- * Get current user from localStorage
- */
-function getCurrentUser() {
-    const userStr = localStorage.getItem('currentUser');
-    return userStr ? JSON.parse(userStr) : null;
-}
-
-/**
  * Format date to month and year
  */
 function formatMemberSince(dateString) {
@@ -33,15 +20,6 @@ function formatMemberSince(dateString) {
     const months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 
                     'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
     return `${months[date.getMonth()]} de ${date.getFullYear()}`;
-}
-
-/**
- * Format date for display
- */
-function formatDate(dateString) {
-    if (!dateString) return 'Fecha desconocida';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 // ============ PROFILE INITIALIZATION ============
@@ -107,29 +85,36 @@ async function loadUserStatistics(user) {
         totalFavoritesEl.textContent = favoritesCount;
     }
     
-    // Ratings are not implemented yet, so show 0
+    // Calculate ratings statistics
+    const ratingsCount = user.ratings ? user.ratings.length : 0;
+    
     if (totalRatingsEl) {
-        totalRatingsEl.textContent = '0';
+        totalRatingsEl.textContent = ratingsCount;
     }
     
-    // Average ratings (placeholder - would need actual rating data)
-    const avgMovieRating = 0;
-    const avgTvRating = 0;
+    // Calculate average rating (out of 5 stars, but display as out of 10 for the chart)
+    let avgRating = 0;
+    if (user.ratings && user.ratings.length > 0) {
+        const totalScore = user.ratings.reduce((sum, rating) => sum + rating.score, 0);
+        avgRating = (totalScore / user.ratings.length) * 2; // Convert to scale of 10
+    }
     
+    // For now, show the same average for both movies and TV
+    // In a more advanced version, we could separate them by content type
     if (movieRatingEl) {
-        movieRatingEl.textContent = avgMovieRating.toFixed(1);
+        movieRatingEl.textContent = avgRating.toFixed(1);
     }
     
     if (tvRatingEl) {
-        tvRatingEl.textContent = avgTvRating.toFixed(1);
+        tvRatingEl.textContent = avgRating.toFixed(1);
     }
     
     if (movieRatingFill) {
-        movieRatingFill.style.width = `${(avgMovieRating / 10) * 100}%`;
+        movieRatingFill.style.width = `${(avgRating / 10) * 100}%`;
     }
     
     if (tvRatingFill) {
-        tvRatingFill.style.width = `${(avgTvRating / 10) * 100}%`;
+        tvRatingFill.style.width = `${(avgRating / 10) * 100}%`;
     }
 }
 

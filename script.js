@@ -1,9 +1,3 @@
-// API Configuration
-const API_KEY = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzOTgxNWVjZTI4ZjcyNWJlZGRmY2Y3OGE0YzRjZGU0ZiIsIm5iZiI6MTc2MDQ1NjUxNS4xNDcsInN1YiI6IjY4ZWU2ZjQzNDYzMzQ0Yjg0MTlkZjQ3MCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.ejdXz4pm0dZn0OAVJvJ16R8SwNAa-MBkO_yttUiblLk';
-const BASE_URL = 'https://api.themoviedb.org/3';
-const IMAGE_URL = 'https://image.tmdb.org/t/p/w500';
-const BACKDROP_URL = 'https://image.tmdb.org/t/p/w780';
-
 // YouTube video ID validation regex (11 characters, alphanumeric with _ and -)
 const YOUTUBE_VIDEO_ID_REGEX = /^[a-zA-Z0-9_-]{11}$/;
 
@@ -677,28 +671,13 @@ let currentTrailerCategory = 'streaming';
 let currentContentType = 'movie'; // Track whether we're showing movies or TV
 let currentCategory = null; // Track current category being displayed
 
+// Pagination State
+let trendingCurrentPage = 1;
+let popularCurrentPage = 1;
+let trendingTotalPages = 1;
+let popularTotalPages = 1;
+
 // ============ UTILITY FUNCTIONS ============
-
-/**
- * Show loading spinner
- */
-function showLoading() {
-    if (loadingSpinner) {
-        loadingSpinner.classList.remove('hidden');
-    }
-    if (errorMessage) {
-        errorMessage.style.display = 'none';
-    }
-}
-
-/**
- * Hide loading spinner
- */
-function hideLoading() {
-    if (loadingSpinner) {
-        loadingSpinner.classList.add('hidden');
-    }
-}
 
 /**
  * Show error message
@@ -708,15 +687,6 @@ function showError() {
     if (errorMessage) {
         errorMessage.style.display = 'flex';
     }
-}
-
-/**
- * Format date to Spanish locale
- */
-function formatDate(dateString) {
-    if (!dateString) return 'Fecha desconocida';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 /**
@@ -940,11 +910,15 @@ function updateSectionTitle(type, category) {
 /**
  * Fetch trending movies
  */
-async function getTrendingMovies(timeWindow = 'day') {
-    const url = `${BASE_URL}/trending/movie/${timeWindow}?language=${currentApiLang}`;
+async function getTrendingMovies(timeWindow = 'day', page = 1, append = false) {
+    const url = `${BASE_URL}/trending/movie/${timeWindow}?language=${currentApiLang}&page=${page}`;
     
     try {
-        showLoading();
+        if (!append) {
+            showLoading();
+            trendingCurrentPage = 1;
+        }
+        
         const res = await fetch(url, options);
         
         if (!res.ok) {
@@ -952,7 +926,20 @@ async function getTrendingMovies(timeWindow = 'day') {
         }
         
         const data = await res.json();
-        displayMovies(data.results, trendingContainer);
+        
+        if (append) {
+            appendMovies(data.results, trendingContainer);
+        } else {
+            displayMovies(data.results, trendingContainer);
+        }
+        
+        // Update pagination state
+        trendingCurrentPage = page;
+        trendingTotalPages = data.total_pages;
+        
+        // Show/hide load more button
+        updateLoadMoreButton('trending', page, data.total_pages);
+        
         hideLoading();
     } catch (error) {
         console.error('Error fetching trending movies:', error);
@@ -963,10 +950,14 @@ async function getTrendingMovies(timeWindow = 'day') {
 /**
  * Fetch popular movies
  */
-async function getPopularMovies() {
-    const url = `${BASE_URL}/movie/popular?language=${currentApiLang}&page=1`;
+async function getPopularMovies(page = 1, append = false) {
+    const url = `${BASE_URL}/movie/popular?language=${currentApiLang}&page=${page}`;
     
     try {
+        if (!append) {
+            popularCurrentPage = 1;
+        }
+        
         const res = await fetch(url, options);
         
         if (!res.ok) {
@@ -974,7 +965,19 @@ async function getPopularMovies() {
         }
         
         const data = await res.json();
-        displayMovies(data.results, popularContainer);
+        
+        if (append) {
+            appendMovies(data.results, popularContainer);
+        } else {
+            displayMovies(data.results, popularContainer);
+        }
+        
+        // Update pagination state
+        popularCurrentPage = page;
+        popularTotalPages = data.total_pages;
+        
+        // Show/hide load more button
+        updateLoadMoreButton('popular', page, data.total_pages);
     } catch (error) {
         console.error('Error fetching popular movies:', error);
     }
@@ -1144,6 +1147,41 @@ function displaySearchResults(items, container) {
  */
 function displayMovies(movies, container) {
     displayContent(movies, container, 'movie');
+}
+
+/**
+ * Append movies to container without clearing existing ones (for pagination)
+ */
+function appendMovies(movies, container) {
+    if (!container) return;
+    
+    const fragment = document.createDocumentFragment();
+    
+    movies.forEach(movie => {
+        const card = createMovieCard(movie, 'movie');
+        if (card) {
+            fragment.appendChild(card);
+        }
+    });
+    
+    container.appendChild(fragment);
+}
+
+/**
+ * Update visibility of load more buttons
+ */
+function updateLoadMoreButton(section, currentPage, totalPages) {
+    const buttonId = section === 'trending' ? 'load-more-trending' : 'load-more-popular';
+    const button = document.getElementById(buttonId);
+    
+    if (button) {
+        if (currentPage < totalPages) {
+            button.style.display = 'flex';
+            button.disabled = false;
+        } else {
+            button.style.display = 'none';
+        }
+    }
 }
 
 /**
@@ -1748,6 +1786,21 @@ function displayMovieDetails(data) {
         </div>
         
         <div class="movie-detail-body">
+            <!-- User Rating Section -->
+            <div class="detail-section" id="user-rating-section">
+                <h2>Tu Valoración</h2>
+                <div class="star-rating-container">
+                    <div class="star-rating" data-movie-id="${details.id}">
+                        <i class="far fa-star star" data-rating="1"></i>
+                        <i class="far fa-star star" data-rating="2"></i>
+                        <i class="far fa-star star" data-rating="3"></i>
+                        <i class="far fa-star star" data-rating="4"></i>
+                        <i class="far fa-star star" data-rating="5"></i>
+                    </div>
+                    <span class="rating-text">Haz clic en una estrella para valorar</span>
+                </div>
+            </div>
+            
             <!-- Trailer Section -->
             <!-- trailerKey is safe to use here as it's validated with YOUTUBE_VIDEO_ID_REGEX -->
             ${trailerKey ? `
@@ -1940,24 +1993,166 @@ function displayMovieDetails(data) {
             closeMovieDetails();
         });
     });
+    
+    // Setup star rating interaction
+    setupStarRating(details.id);
+}
+
+// ============ RATING SYSTEM ============
+
+/**
+ * Setup star rating interaction for a movie
+ */
+function setupStarRating(movieId) {
+    const currentUser = getCurrentUser();
+    const stars = document.querySelectorAll('.star-rating .star');
+    const ratingText = document.querySelector('.rating-text');
+    const starContainer = document.querySelector('.star-rating');
+    
+    if (!stars || stars.length === 0) return;
+    
+    // Check if user is logged in
+    if (!currentUser) {
+        if (ratingText) {
+            ratingText.textContent = 'Inicia sesión para valorar esta película';
+        }
+        return;
+    }
+    
+    // Load user's existing rating if any
+    const existingRating = getUserRatingForMovie(currentUser, movieId);
+    if (existingRating) {
+        updateStarDisplay(stars, existingRating.score);
+        if (ratingText) {
+            ratingText.textContent = `Tu valoración: ${existingRating.score}/5 estrellas`;
+        }
+    }
+    
+    // Add hover effect
+    stars.forEach(star => {
+        star.addEventListener('mouseenter', () => {
+            const rating = parseInt(star.getAttribute('data-rating'));
+            updateStarDisplay(stars, rating, true);
+        });
+    });
+    
+    // Reset on mouse leave
+    if (starContainer) {
+        starContainer.addEventListener('mouseleave', () => {
+            const currentRating = existingRating ? existingRating.score : 0;
+            updateStarDisplay(stars, currentRating);
+        });
+    }
+    
+    // Handle click to save rating
+    stars.forEach(star => {
+        star.addEventListener('click', async () => {
+            const rating = parseInt(star.getAttribute('data-rating'));
+            await saveMovieRating(movieId, rating);
+        });
+    });
+}
+
+/**
+ * Update star display
+ */
+function updateStarDisplay(stars, rating, isHover = false) {
+    stars.forEach(star => {
+        const starRating = parseInt(star.getAttribute('data-rating'));
+        if (starRating <= rating) {
+            star.classList.remove('far');
+            star.classList.add('fas');
+            if (isHover) {
+                star.style.color = '#f5c518';
+            } else {
+                star.style.color = '#21d07a';
+            }
+        } else {
+            star.classList.remove('fas');
+            star.classList.add('far');
+            star.style.color = '';
+        }
+    });
+}
+
+/**
+ * Get user's rating for a specific movie
+ */
+function getUserRatingForMovie(user, movieId) {
+    if (!user.ratings || user.ratings.length === 0) return null;
+    return user.ratings.find(rating => rating.movieId === parseInt(movieId));
+}
+
+/**
+ * Save movie rating
+ */
+async function saveMovieRating(movieId, score) {
+    const currentUser = getCurrentUser();
+    
+    if (!currentUser) {
+        showToast('Por favor, inicia sesión para valorar películas', 'warning');
+        return;
+    }
+    
+    try {
+        // Initialize ratings array if it doesn't exist
+        if (!currentUser.ratings) {
+            currentUser.ratings = [];
+        }
+        
+        // Check if rating already exists
+        const existingRatingIndex = currentUser.ratings.findIndex(r => r.movieId === parseInt(movieId));
+        
+        const newRating = {
+            movieId: parseInt(movieId),
+            score: score,
+            date: new Date().toISOString()
+        };
+        
+        let updatedRatings;
+        if (existingRatingIndex > -1) {
+            // Update existing rating
+            updatedRatings = [...currentUser.ratings];
+            updatedRatings[existingRatingIndex] = newRating;
+        } else {
+            // Add new rating
+            updatedRatings = [...currentUser.ratings, newRating];
+        }
+        
+        // Update user in json-server
+        const response = await fetch(`http://localhost:3000/usuarios/${currentUser.id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ ratings: updatedRatings })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Error al guardar la valoración');
+        }
+        
+        // Update localStorage
+        currentUser.ratings = updatedRatings;
+        updateCurrentUser(currentUser);
+        
+        // Update UI
+        const stars = document.querySelectorAll('.star-rating .star');
+        const ratingText = document.querySelector('.rating-text');
+        updateStarDisplay(stars, score);
+        if (ratingText) {
+            ratingText.textContent = `Tu valoración: ${score}/5 estrellas`;
+        }
+        
+        showToast(`¡Película valorada con ${score} estrellas!`, 'success');
+        
+    } catch (error) {
+        console.error('Error saving rating:', error);
+        showToast('Hubo un error al guardar tu valoración. Por favor, verifica que json-server esté ejecutándose.', 'error');
+    }
 }
 
 // ============ FAVORITES FUNCTIONS ============
-
-/**
- * Get current user from localStorage (imported from app.js context)
- */
-function getCurrentUser() {
-    const userStr = localStorage.getItem('currentUser');
-    return userStr ? JSON.parse(userStr) : null;
-}
-
-/**
- * Update current user in localStorage
- */
-function updateCurrentUser(user) {
-    localStorage.setItem('currentUser', JSON.stringify(user));
-}
 
 /**
  * Toggle favorite status for a movie
@@ -1967,8 +2162,10 @@ async function toggleFavorite(movieId) {
     
     // Check if user is logged in
     if (!currentUser) {
-        alert('Por favor, inicia sesión para agregar películas a favoritos');
-        window.location.href = 'auth.html';
+        showToast('Por favor, inicia sesión para agregar películas a favoritos', 'warning');
+        setTimeout(() => {
+            window.location.href = 'auth.html';
+        }, 1000);
         return;
     }
     
@@ -2025,7 +2222,7 @@ async function toggleFavorite(movieId) {
         
     } catch (error) {
         console.error('Error toggling favorite:', error);
-        alert('Hubo un error al actualizar los favoritos. Por favor, verifica que json-server esté ejecutándose.');
+        showToast('Hubo un error al actualizar los favoritos. Por favor, verifica que json-server esté ejecutándose.', 'error');
     }
 }
 
@@ -2104,6 +2301,36 @@ function toggleFavoritesSection() {
     }
 }
 
+/**
+ * Setup load more buttons
+ */
+function setupLoadMoreButtons() {
+    const loadMoreTrending = document.getElementById('load-more-trending');
+    const loadMorePopular = document.getElementById('load-more-popular');
+    
+    if (loadMoreTrending) {
+        loadMoreTrending.addEventListener('click', async () => {
+            loadMoreTrending.disabled = true;
+            loadMoreTrending.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cargando...';
+            
+            await getTrendingMovies(currentTrendingTime, trendingCurrentPage + 1, true);
+            
+            loadMoreTrending.innerHTML = '<i class="fas fa-plus-circle"></i> Cargar más';
+        });
+    }
+    
+    if (loadMorePopular) {
+        loadMorePopular.addEventListener('click', async () => {
+            loadMorePopular.disabled = true;
+            loadMorePopular.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cargando...';
+            
+            await getPopularMovies(popularCurrentPage + 1, true);
+            
+            loadMorePopular.innerHTML = '<i class="fas fa-plus-circle"></i> Cargar más';
+        });
+    }
+}
+
 // ============ INITIALIZATION ============
 
 /**
@@ -2122,6 +2349,7 @@ function init() {
     setupInfoModals();
     setupProjectInfoModal();
     setupLanguageSelector();
+    setupLoadMoreButtons();
     
     // Load language preference
     loadLanguagePreference();
@@ -2396,8 +2624,8 @@ async function handleSupportFormSubmit(e) {
     } catch (error) {
         console.error('Error submitting support ticket:', error);
         
-        // Show error alert to user
-        alert('Hubo un error al enviar tu solicitud de soporte. Por favor, verifica que el servidor esté ejecutándose (json-server) e intenta de nuevo.');
+        // Show error toast to user
+        showToast('Hubo un error al enviar tu solicitud de soporte. Por favor, verifica que el servidor esté ejecutándose (json-server) e intenta de nuevo.', 'error');
     }
 }
 

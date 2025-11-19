@@ -10,7 +10,8 @@
         550,
         680,
         27205
-      ]
+      ],
+      "ratings": []
     },
     {
       "name": "hugorollan",
@@ -18,6 +19,7 @@
       "password": "password123",
       "createdAt": "2025-11-19T11:39:19.012Z",
       "favorites": [],
+      "ratings": [],
       "id": 2
     }
   ],

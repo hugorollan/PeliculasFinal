@@ -171,6 +171,11 @@
                     <p>No se pudieron cargar las películas. Por favor, inténtalo de nuevo.</p>
                 </div>
             </div>
+            <div class="load-more-container">
+                <button id="load-more-trending" class="btn-load-more" style="display: none;">
+                    <i class="fas fa-plus-circle"></i> Cargar más
+                </button>
+            </div>
         </section>
 
         <section class="popular-section" aria-labelledby="popular-title">
@@ -218,6 +223,11 @@
 
             <div class="scroller-wrapper">
                 <div id="popular-container" class="scroller" role="tabpanel"></div>
+            </div>
+            <div class="load-more-container">
+                <button id="load-more-popular" class="btn-load-more" style="display: none;">
+                    <i class="fas fa-plus-circle"></i> Cargar más
+                </button>
             </div>
         </section>
 
@@ -488,6 +498,7 @@
         </div>
     </footer>
 
+    <script src="config.js"></script>
     <script src="app.js"></script>
     <script src="script.js"></script>
 </body>
