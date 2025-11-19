@@ -59,7 +59,26 @@
                 <div class="lang-box" role="button" tabindex="0" aria-label="Cambiar idioma">ES</div>
                 <a href="auth.html" class="nav-link">Iniciar sesión</a>
                 <a href="auth.html" class="nav-link btn-join">Únete a PFHR</a>
-                <button class="icon-btn search-icon-nav" aria-label="Buscar"><i class="fas fa-search"></i></button>
+                <button class="icon-btn search-icon-nav" id="search-toggle-btn" aria-label="Buscar"><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+
+        <!-- Search Dropdown -->
+        <div class="search-dropdown" id="search-dropdown" style="display: none;">
+            <div class="search-dropdown-content">
+                <div class="search-input-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input 
+                        type="text" 
+                        id="nav-search-input" 
+                        class="nav-search-input" 
+                        placeholder="Buscar una película, serie, persona..."
+                        autocomplete="off">
+                </div>
+                <div class="search-trends" id="search-trends">
+                    <h3><i class="fas fa-chart-line"></i> Tendencias</h3>
+                    <div id="search-trends-list" class="trends-list"></div>
+                </div>
             </div>
         </div>
     </nav>
@@ -236,13 +255,147 @@
         </div>
     </div>
 
+    <!-- About Modal -->
+    <div id="about-modal" class="modal" style="display: none;">
+        <div class="modal-overlay"></div>
+        <div class="modal-content info-modal">
+            <button class="modal-close" aria-label="Cerrar">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="info-modal-body">
+                <h2><i class="fas fa-info-circle"></i> Acerca de PFHR</h2>
+                <div class="about-content">
+                    <p class="lead">PFHR es una plataforma web moderna dedicada a los amantes del cine y las series de televisión.</p>
+                    
+                    <h3>¿Qué es PFHR?</h3>
+                    <p>PFHR (Películas, Films, Hollywood & Reviews) es una aplicación web que te permite explorar, descubrir y organizar tu contenido audiovisual favorito. Con una interfaz intuitiva y elegante, puedes acceder a información detallada sobre miles de películas, series de televisión y personalidades del mundo del entretenimiento.</p>
+                    
+                    <h3>Características principales</h3>
+                    <ul class="features-list">
+                        <li><i class="fas fa-check-circle"></i> <strong>Búsqueda avanzada:</strong> Encuentra fácilmente películas, series y personas</li>
+                        <li><i class="fas fa-check-circle"></i> <strong>Información detallada:</strong> Sinopsis, reparto, valoraciones y más</li>
+                        <li><i class="fas fa-check-circle"></i> <strong>Tendencias:</strong> Mantente al día con lo más popular</li>
+                        <li><i class="fas fa-check-circle"></i> <strong>Lista de favoritos:</strong> Guarda tus películas y series preferidas</li>
+                        <li><i class="fas fa-check-circle"></i> <strong>Tráilers:</strong> Visualiza tráilers directamente en la plataforma</li>
+                        <li><i class="fas fa-check-circle"></i> <strong>Recomendaciones:</strong> Descubre contenido similar a tus favoritos</li>
+                    </ul>
+                    
+                    <h3>Tecnología</h3>
+                    <p>PFHR está construido con las últimas tecnologías web y utiliza la API de The Movie Database (TMDB) para proporcionar información actualizada y precisa sobre el contenido audiovisual.</p>
+                    
+                    <h3>Nuestra misión</h3>
+                    <p>Hacer que la experiencia de descubrir y disfrutar contenido audiovisual sea más accesible, organizada y placentera para todos los usuarios.</p>
+                    
+                    <div class="about-footer">
+                        <p><strong>Versión:</strong> 1.0.0 | <strong>Última actualización:</strong> Noviembre 2024</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Support Modal -->
+    <div id="support-modal" class="modal" style="display: none;">
+        <div class="modal-overlay"></div>
+        <div class="modal-content info-modal">
+            <button class="modal-close" aria-label="Cerrar">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="info-modal-body">
+                <h2><i class="fas fa-headset"></i> Contactar con el soporte</h2>
+                <p class="support-intro">¿Tienes alguna pregunta o necesitas ayuda? Completa el formulario y nos pondremos en contacto contigo lo antes posible.</p>
+                
+                <form id="support-form" class="support-form">
+                    <div class="form-group">
+                        <label for="support-name">
+                            <i class="fas fa-user"></i> Nombre completo *
+                        </label>
+                        <input 
+                            type="text" 
+                            id="support-name" 
+                            name="name" 
+                            required 
+                            placeholder="Tu nombre">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="support-email">
+                            <i class="fas fa-envelope"></i> Email *
+                        </label>
+                        <input 
+                            type="email" 
+                            id="support-email" 
+                            name="email" 
+                            required 
+                            placeholder="tu@email.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="support-reason">
+                            <i class="fas fa-tag"></i> Motivo de consulta *
+                        </label>
+                        <select id="support-reason" name="reason" required>
+                            <option value="">Selecciona un motivo</option>
+                            <option value="technical">Problema técnico</option>
+                            <option value="account">Problema con mi cuenta</option>
+                            <option value="suggestion">Sugerencia o mejora</option>
+                            <option value="content">Contenido faltante o incorrecto</option>
+                            <option value="billing">Consulta sobre facturación</option>
+                            <option value="other">Otro</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="support-subject">
+                            <i class="fas fa-pen"></i> Asunto *
+                        </label>
+                        <input 
+                            type="text" 
+                            id="support-subject" 
+                            name="subject" 
+                            required 
+                            placeholder="Asunto de tu consulta">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="support-message">
+                            <i class="fas fa-comment-dots"></i> Mensaje *
+                        </label>
+                        <textarea 
+                            id="support-message" 
+                            name="message" 
+                            rows="6" 
+                            required 
+                            placeholder="Describe tu consulta con el mayor detalle posible..."></textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit">
+                            <i class="fas fa-paper-plane"></i> Enviar consulta
+                        </button>
+                        <button type="button" class="btn-cancel" id="support-cancel">
+                            Cancelar
+                        </button>
+                    </div>
+                </form>
+                
+                <div id="support-success" class="support-success" style="display: none;">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>¡Mensaje enviado correctamente!</h3>
+                    <p>Hemos recibido tu consulta. Nuestro equipo de soporte te responderá en un plazo de 24-48 horas.</p>
+                    <button class="btn-close-success" id="close-success">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <footer class="footer" role="contentinfo">
         <div class="footer-content">
             <div class="footer-section">
                 <h3>PFHR</h3>
                 <ul>
-                    <li><a href="#">Acerca de PFHR</a></li>
-                    <li><a href="#">Contactar con el soporte</a></li>
+                    <li><a href="#" id="about-link">Acerca de PFHR</a></li>
+                    <li><a href="#" id="support-link">Contactar con el soporte</a></li>
                     <li><a href="#">API</a></li>
                     <li><a href="#">Blog</a></li>
                 </ul>

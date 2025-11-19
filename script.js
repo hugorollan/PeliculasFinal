@@ -603,6 +603,182 @@ function setupSearchForm() {
             }
         });
     }
+    
+    // Setup navbar search dropdown
+    setupNavbarSearch();
+}
+
+/**
+ * Setup navbar search dropdown functionality
+ */
+function setupNavbarSearch() {
+    const searchToggleBtn = document.getElementById('search-toggle-btn');
+    const searchDropdown = document.getElementById('search-dropdown');
+    const navSearchInput = document.getElementById('nav-search-input');
+    const searchTrendsList = document.getElementById('search-trends-list');
+    
+    if (!searchToggleBtn || !searchDropdown) return;
+    
+    // Create backdrop
+    const backdrop = document.createElement('div');
+    backdrop.className = 'search-backdrop';
+    document.body.appendChild(backdrop);
+    
+    // Toggle search dropdown
+    searchToggleBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const isOpen = searchDropdown.style.display === 'block';
+        
+        if (isOpen) {
+            closeSearchDropdown();
+        } else {
+            openSearchDropdown();
+        }
+    });
+    
+    // Open search dropdown
+    async function openSearchDropdown() {
+        searchDropdown.style.display = 'block';
+        backdrop.classList.add('active');
+        navSearchInput.focus();
+        
+        // Load trending searches
+        await loadTrendingSearches();
+    }
+    
+    // Close search dropdown
+    function closeSearchDropdown() {
+        searchDropdown.style.display = 'none';
+        backdrop.classList.remove('active');
+        navSearchInput.value = '';
+    }
+    
+    // Close on backdrop click
+    backdrop.addEventListener('click', closeSearchDropdown);
+    
+    // Close on ESC key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && searchDropdown.style.display === 'block') {
+            closeSearchDropdown();
+        }
+    });
+    
+    // Handle search input
+    if (navSearchInput) {
+        navSearchInput.addEventListener('input', debounce(async (e) => {
+            const query = e.target.value.trim();
+            
+            if (query.length >= 2) {
+                await performNavSearch(query);
+            } else {
+                await loadTrendingSearches();
+            }
+        }, 300));
+        
+        navSearchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const query = navSearchInput.value.trim();
+                if (query) {
+                    searchMovies(query);
+                    closeSearchDropdown();
+                    // Scroll to results
+                    setTimeout(() => {
+                        document.querySelector('.trending-section')?.scrollIntoView({ behavior: 'smooth' });
+                    }, 100);
+                }
+            }
+        });
+    }
+    
+    // Load trending searches
+    async function loadTrendingSearches() {
+        if (!searchTrendsList) return;
+        
+        try {
+            searchTrendsList.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-secondary);">Cargando tendencias...</div>';
+            
+            const url = `${BASE_URL}/trending/all/day?language=es-ES`;
+            const res = await fetch(url, options);
+            
+            if (!res.ok) throw new Error('Error loading trends');
+            
+            const data = await res.json();
+            displayTrendingSearches(data.results.slice(0, 10));
+        } catch (error) {
+            console.error('Error loading trending searches:', error);
+            searchTrendsList.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-secondary);">No se pudieron cargar las tendencias</div>';
+        }
+    }
+    
+    // Display trending searches
+    function displayTrendingSearches(items) {
+        if (!searchTrendsList) return;
+        
+        searchTrendsList.innerHTML = '';
+        
+        items.forEach(item => {
+            const title = item.title || item.name;
+            const type = item.media_type === 'movie' ? 'Película' : item.media_type === 'tv' ? 'Serie' : 'Persona';
+            const year = item.release_date ? new Date(item.release_date).getFullYear() : 
+                         item.first_air_date ? new Date(item.first_air_date).getFullYear() : '';
+            
+            const trendItem = document.createElement('div');
+            trendItem.className = 'trend-item';
+            trendItem.innerHTML = `
+                <i class="fas fa-search search-icon"></i>
+                <span class="trend-item-text">${title}</span>
+                <span class="trend-item-info">${type}${year ? ' · ' + year : ''}</span>
+            `;
+            
+            trendItem.addEventListener('click', () => {
+                navSearchInput.value = title;
+                searchMovies(title);
+                closeSearchDropdown();
+                setTimeout(() => {
+                    document.querySelector('.trending-section')?.scrollIntoView({ behavior: 'smooth' });
+                }, 100);
+            });
+            
+            searchTrendsList.appendChild(trendItem);
+        });
+    }
+    
+    // Perform search from navbar
+    async function performNavSearch(query) {
+        if (!searchTrendsList) return;
+        
+        try {
+            const url = `${BASE_URL}/search/multi?language=es-ES&query=${encodeURIComponent(query)}&page=1`;
+            const res = await fetch(url, options);
+            
+            if (!res.ok) throw new Error('Error searching');
+            
+            const data = await res.json();
+            const results = data.results.filter(item => 
+                item.media_type === 'movie' || item.media_type === 'tv' || item.media_type === 'person'
+            ).slice(0, 10);
+            
+            displayTrendingSearches(results);
+        } catch (error) {
+            console.error('Error performing search:', error);
+        }
+    }
+}
+
+/**
+ * Debounce function for search input
+ */
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
 }
 
 /**
@@ -1266,6 +1442,7 @@ function init() {
     setupNavigationDropdowns();
     setupModalHandlers();
     setupFavoritesToggle();
+    setupInfoModals();
     
     // Load initial data
     getTrendingMovies('day');
@@ -1319,9 +1496,198 @@ function setupModalHandlers() {
     }
 }
 
+// ============ INFO MODALS (ABOUT & SUPPORT) ============
+
+/**
+ * Setup info modals (About and Support)
+ */
+function setupInfoModals() {
+    // About modal
+    const aboutLink = document.getElementById('about-link');
+    const aboutModal = document.getElementById('about-modal');
+    
+    if (aboutLink && aboutModal) {
+        aboutLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            openAboutModal();
+        });
+        
+        // Close on overlay click
+        const overlay = aboutModal.querySelector('.modal-overlay');
+        if (overlay) {
+            overlay.addEventListener('click', closeAboutModal);
+        }
+        
+        // Close on close button click
+        const closeBtn = aboutModal.querySelector('.modal-close');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', closeAboutModal);
+        }
+        
+        // Close on ESC key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && aboutModal.style.display === 'block') {
+                closeAboutModal();
+            }
+        });
+    }
+    
+    // Support modal
+    const supportLink = document.getElementById('support-link');
+    const supportModal = document.getElementById('support-modal');
+    const supportForm = document.getElementById('support-form');
+    const supportSuccess = document.getElementById('support-success');
+    
+    if (supportLink && supportModal) {
+        supportLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            openSupportModal();
+        });
+        
+        // Close on overlay click
+        const overlay = supportModal.querySelector('.modal-overlay');
+        if (overlay) {
+            overlay.addEventListener('click', closeSupportModal);
+        }
+        
+        // Close on close button click
+        const closeBtn = supportModal.querySelector('.modal-close');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', closeSupportModal);
+        }
+        
+        // Cancel button
+        const cancelBtn = document.getElementById('support-cancel');
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', closeSupportModal);
+        }
+        
+        // Close success message
+        const closeSuccessBtn = document.getElementById('close-success');
+        if (closeSuccessBtn) {
+            closeSuccessBtn.addEventListener('click', closeSupportModal);
+        }
+        
+        // Handle form submission
+        if (supportForm) {
+            supportForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                handleSupportFormSubmit(e);
+            });
+        }
+        
+        // Close on ESC key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && supportModal.style.display === 'block') {
+                closeSupportModal();
+            }
+        });
+    }
+}
+
+/**
+ * Open About modal
+ */
+function openAboutModal() {
+    const aboutModal = document.getElementById('about-modal');
+    if (aboutModal) {
+        aboutModal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+/**
+ * Close About modal
+ */
+function closeAboutModal() {
+    const aboutModal = document.getElementById('about-modal');
+    if (aboutModal) {
+        aboutModal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+}
+
+/**
+ * Open Support modal
+ */
+function openSupportModal() {
+    const supportModal = document.getElementById('support-modal');
+    const supportForm = document.getElementById('support-form');
+    const supportSuccess = document.getElementById('support-success');
+    
+    if (supportModal) {
+        supportModal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+        
+        // Reset form and show it
+        if (supportForm) {
+            supportForm.reset();
+            supportForm.style.display = 'block';
+        }
+        
+        // Hide success message
+        if (supportSuccess) {
+            supportSuccess.style.display = 'none';
+        }
+    }
+}
+
+/**
+ * Close Support modal
+ */
+function closeSupportModal() {
+    const supportModal = document.getElementById('support-modal');
+    const supportForm = document.getElementById('support-form');
+    
+    if (supportModal) {
+        supportModal.style.display = 'none';
+        document.body.style.overflow = '';
+        
+        // Reset form
+        if (supportForm) {
+            supportForm.reset();
+        }
+    }
+}
+
+/**
+ * Handle support form submission
+ */
+function handleSupportFormSubmit(e) {
+    const supportForm = document.getElementById('support-form');
+    const supportSuccess = document.getElementById('support-success');
+    
+    // Get form data
+    const formData = {
+        name: document.getElementById('support-name').value,
+        email: document.getElementById('support-email').value,
+        reason: document.getElementById('support-reason').value,
+        subject: document.getElementById('support-subject').value,
+        message: document.getElementById('support-message').value,
+        timestamp: new Date().toISOString()
+    };
+    
+    // Log to console (in a real app, this would be sent to a server)
+    console.log('Support form submitted:', formData);
+    
+    // Show success message
+    if (supportForm && supportSuccess) {
+        supportForm.style.display = 'none';
+        supportSuccess.style.display = 'block';
+    }
+    
+    // In a real application, you would send this data to a server:
+    // fetch('/api/support', {
+    //     method: 'POST',
+    //     headers: { 'Content-Type': 'application/json' },
+    //     body: JSON.stringify(formData)
+    // });
+}
+
 // Start the application when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
 } else {
     init();
 }
+

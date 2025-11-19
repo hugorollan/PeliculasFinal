@@ -47,6 +47,7 @@ body {
     top: 0;
     z-index: 1000;
     box-shadow: var(--shadow-sm);
+    position: relative;
 }
 
 .nav-wrapper {
@@ -206,6 +207,125 @@ body {
 .btn-join:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
+}
+
+/* --- Search Dropdown --- */
+.search-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: var(--tmdb-white);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 999;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.search-dropdown-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 30px 40px;
+}
+
+.search-input-wrapper {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.search-input-wrapper .search-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    font-size: 18px;
+}
+
+.nav-search-input {
+    width: 100%;
+    padding: 15px 15px 15px 50px;
+    font-size: 18px;
+    border: 2px solid var(--tmdb-grey);
+    border-radius: 30px;
+    outline: none;
+    transition: border-color 0.3s ease;
+    font-family: 'Source Sans Pro', Arial, sans-serif;
+}
+
+.nav-search-input:focus {
+    border-color: var(--tmdb-light-blue);
+}
+
+.search-trends {
+    margin-top: 20px;
+}
+
+.search-trends h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.search-trends h3 i {
+    color: var(--tmdb-light-blue);
+}
+
+.trends-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.trend-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    gap: 15px;
+}
+
+.trend-item:hover {
+    background-color: rgba(1, 180, 228, 0.1);
+}
+
+.trend-item .search-icon {
+    color: var(--text-secondary);
+    font-size: 14px;
+    min-width: 20px;
+}
+
+.trend-item-text {
+    flex: 1;
+    font-size: 16px;
+    color: var(--text-primary);
+}
+
+.trend-item-info {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+/* Search dropdown backdrop */
+.search-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+    display: none;
+}
+
+.search-backdrop.active {
+    display: block;
 }
 
 /* --- Hero Section (Bienvenida) --- */
@@ -1699,6 +1819,255 @@ main {
 
 #favorites-toggle-btn .fa-heart {
     font-size: 1rem;
+}
+
+/* ============ INFO MODALS (ABOUT & SUPPORT) ============ */
+
+.info-modal {
+    max-width: 700px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background-color: var(--tmdb-white);
+    border-radius: 12px;
+}
+
+.info-modal-body {
+    padding: 40px;
+}
+
+.info-modal-body h2 {
+    color: var(--tmdb-dark-blue);
+    font-size: 2rem;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.info-modal-body h2 i {
+    color: var(--tmdb-light-blue);
+}
+
+.info-modal-body h3 {
+    color: var(--tmdb-dark-blue);
+    font-size: 1.3rem;
+    margin-top: 25px;
+    margin-bottom: 12px;
+}
+
+/* About Modal Styles */
+.about-content .lead {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+.about-content p {
+    margin-bottom: 15px;
+    line-height: 1.7;
+    color: var(--text-primary);
+}
+
+.features-list {
+    list-style: none;
+    padding: 0;
+    margin: 15px 0;
+}
+
+.features-list li {
+    padding: 10px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    line-height: 1.6;
+}
+
+.features-list li i {
+    color: var(--success-green);
+    margin-top: 4px;
+    font-size: 1.1rem;
+}
+
+.about-footer {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px solid var(--tmdb-grey);
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* Support Form Styles */
+.support-intro {
+    color: var(--text-secondary);
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+.support-form {
+    margin-top: 20px;
+}
+
+.support-form .form-group {
+    margin-bottom: 20px;
+}
+
+.support-form label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.support-form label i {
+    color: var(--tmdb-light-blue);
+}
+
+.support-form input,
+.support-form select,
+.support-form textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid var(--tmdb-grey);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: 'Source Sans Pro', Arial, sans-serif;
+    transition: border-color 0.3s ease;
+    outline: none;
+}
+
+.support-form input:focus,
+.support-form select:focus,
+.support-form textarea:focus {
+    border-color: var(--tmdb-light-blue);
+}
+
+.support-form select {
+    cursor: pointer;
+    background-color: var(--tmdb-white);
+}
+
+.support-form textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.btn-submit {
+    flex: 1;
+    background: linear-gradient(to right, var(--tmdb-light-green), var(--tmdb-light-blue));
+    color: var(--tmdb-white);
+    border: none;
+    padding: 14px 30px;
+    border-radius: 8px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-submit:active {
+    transform: translateY(0);
+}
+
+.btn-cancel {
+    background-color: var(--tmdb-grey);
+    color: var(--text-primary);
+    border: none;
+    padding: 14px 30px;
+    border-radius: 8px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-cancel:hover {
+    background-color: #d0d0d0;
+}
+
+/* Support Success Message */
+.support-success {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.support-success i {
+    font-size: 4rem;
+    color: var(--success-green);
+    margin-bottom: 20px;
+}
+
+.support-success h3 {
+    color: var(--tmdb-dark-blue);
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+}
+
+.support-success p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+.btn-close-success {
+    background: linear-gradient(to right, var(--tmdb-light-green), var(--tmdb-light-blue));
+    color: var(--tmdb-white);
+    border: none;
+    padding: 12px 40px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.btn-close-success:hover {
+    transform: translateY(-2px);
+}
+
+/* Responsive for info modals */
+@media (max-width: 768px) {
+    .info-modal {
+        max-width: calc(100% - 40px);
+        margin: 20px;
+    }
+    
+    .info-modal-body {
+        padding: 25px;
+    }
+    
+    .info-modal-body h2 {
+        font-size: 1.5rem;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .btn-submit,
+    .btn-cancel {
+        width: 100%;
+    }
 }
 
 
