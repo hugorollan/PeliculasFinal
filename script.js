@@ -671,6 +671,12 @@ let currentTrailerCategory = 'streaming';
 let currentContentType = 'movie'; // Track whether we're showing movies or TV
 let currentCategory = null; // Track current category being displayed
 
+// Pagination State
+let trendingCurrentPage = 1;
+let popularCurrentPage = 1;
+let trendingTotalPages = 1;
+let popularTotalPages = 1;
+
 // ============ UTILITY FUNCTIONS ============
 
 /**
@@ -904,11 +910,15 @@ function updateSectionTitle(type, category) {
 /**
  * Fetch trending movies
  */
-async function getTrendingMovies(timeWindow = 'day') {
-    const url = `${BASE_URL}/trending/movie/${timeWindow}?language=${currentApiLang}`;
+async function getTrendingMovies(timeWindow = 'day', page = 1, append = false) {
+    const url = `${BASE_URL}/trending/movie/${timeWindow}?language=${currentApiLang}&page=${page}`;
     
     try {
-        showLoading();
+        if (!append) {
+            showLoading();
+            trendingCurrentPage = 1;
+        }
+        
         const res = await fetch(url, options);
         
         if (!res.ok) {
@@ -916,7 +926,20 @@ async function getTrendingMovies(timeWindow = 'day') {
         }
         
         const data = await res.json();
-        displayMovies(data.results, trendingContainer);
+        
+        if (append) {
+            appendMovies(data.results, trendingContainer);
+        } else {
+            displayMovies(data.results, trendingContainer);
+        }
+        
+        // Update pagination state
+        trendingCurrentPage = page;
+        trendingTotalPages = data.total_pages;
+        
+        // Show/hide load more button
+        updateLoadMoreButton('trending', page, data.total_pages);
+        
         hideLoading();
     } catch (error) {
         console.error('Error fetching trending movies:', error);
@@ -927,10 +950,14 @@ async function getTrendingMovies(timeWindow = 'day') {
 /**
  * Fetch popular movies
  */
-async function getPopularMovies() {
-    const url = `${BASE_URL}/movie/popular?language=${currentApiLang}&page=1`;
+async function getPopularMovies(page = 1, append = false) {
+    const url = `${BASE_URL}/movie/popular?language=${currentApiLang}&page=${page}`;
     
     try {
+        if (!append) {
+            popularCurrentPage = 1;
+        }
+        
         const res = await fetch(url, options);
         
         if (!res.ok) {
@@ -938,7 +965,19 @@ async function getPopularMovies() {
         }
         
         const data = await res.json();
-        displayMovies(data.results, popularContainer);
+        
+        if (append) {
+            appendMovies(data.results, popularContainer);
+        } else {
+            displayMovies(data.results, popularContainer);
+        }
+        
+        // Update pagination state
+        popularCurrentPage = page;
+        popularTotalPages = data.total_pages;
+        
+        // Show/hide load more button
+        updateLoadMoreButton('popular', page, data.total_pages);
     } catch (error) {
         console.error('Error fetching popular movies:', error);
     }
@@ -1108,6 +1147,41 @@ function displaySearchResults(items, container) {
  */
 function displayMovies(movies, container) {
     displayContent(movies, container, 'movie');
+}
+
+/**
+ * Append movies to container without clearing existing ones (for pagination)
+ */
+function appendMovies(movies, container) {
+    if (!container) return;
+    
+    const fragment = document.createDocumentFragment();
+    
+    movies.forEach(movie => {
+        const card = createMovieCard(movie, 'movie');
+        if (card) {
+            fragment.appendChild(card);
+        }
+    });
+    
+    container.appendChild(fragment);
+}
+
+/**
+ * Update visibility of load more buttons
+ */
+function updateLoadMoreButton(section, currentPage, totalPages) {
+    const buttonId = section === 'trending' ? 'load-more-trending' : 'load-more-popular';
+    const button = document.getElementById(buttonId);
+    
+    if (button) {
+        if (currentPage < totalPages) {
+            button.style.display = 'flex';
+            button.disabled = false;
+        } else {
+            button.style.display = 'none';
+        }
+    }
 }
 
 /**
@@ -2055,6 +2129,36 @@ function toggleFavoritesSection() {
     }
 }
 
+/**
+ * Setup load more buttons
+ */
+function setupLoadMoreButtons() {
+    const loadMoreTrending = document.getElementById('load-more-trending');
+    const loadMorePopular = document.getElementById('load-more-popular');
+    
+    if (loadMoreTrending) {
+        loadMoreTrending.addEventListener('click', async () => {
+            loadMoreTrending.disabled = true;
+            loadMoreTrending.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cargando...';
+            
+            await getTrendingMovies(currentTrendingTime, trendingCurrentPage + 1, true);
+            
+            loadMoreTrending.innerHTML = '<i class="fas fa-plus-circle"></i> Cargar más';
+        });
+    }
+    
+    if (loadMorePopular) {
+        loadMorePopular.addEventListener('click', async () => {
+            loadMorePopular.disabled = true;
+            loadMorePopular.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cargando...';
+            
+            await getPopularMovies(popularCurrentPage + 1, true);
+            
+            loadMorePopular.innerHTML = '<i class="fas fa-plus-circle"></i> Cargar más';
+        });
+    }
+}
+
 // ============ INITIALIZATION ============
 
 /**
@@ -2073,6 +2177,7 @@ function init() {
     setupInfoModals();
     setupProjectInfoModal();
     setupLanguageSelector();
+    setupLoadMoreButtons();
     
     // Load language preference
     loadLanguagePreference();
