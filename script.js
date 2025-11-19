@@ -1786,6 +1786,21 @@ function displayMovieDetails(data) {
         </div>
         
         <div class="movie-detail-body">
+            <!-- User Rating Section -->
+            <div class="detail-section" id="user-rating-section">
+                <h2>Tu Valoración</h2>
+                <div class="star-rating-container">
+                    <div class="star-rating" data-movie-id="${details.id}">
+                        <i class="far fa-star star" data-rating="1"></i>
+                        <i class="far fa-star star" data-rating="2"></i>
+                        <i class="far fa-star star" data-rating="3"></i>
+                        <i class="far fa-star star" data-rating="4"></i>
+                        <i class="far fa-star star" data-rating="5"></i>
+                    </div>
+                    <span class="rating-text">Haz clic en una estrella para valorar</span>
+                </div>
+            </div>
+            
             <!-- Trailer Section -->
             <!-- trailerKey is safe to use here as it's validated with YOUTUBE_VIDEO_ID_REGEX -->
             ${trailerKey ? `
@@ -1978,6 +1993,163 @@ function displayMovieDetails(data) {
             closeMovieDetails();
         });
     });
+    
+    // Setup star rating interaction
+    setupStarRating(details.id);
+}
+
+// ============ RATING SYSTEM ============
+
+/**
+ * Setup star rating interaction for a movie
+ */
+function setupStarRating(movieId) {
+    const currentUser = getCurrentUser();
+    const stars = document.querySelectorAll('.star-rating .star');
+    const ratingText = document.querySelector('.rating-text');
+    const starContainer = document.querySelector('.star-rating');
+    
+    if (!stars || stars.length === 0) return;
+    
+    // Check if user is logged in
+    if (!currentUser) {
+        if (ratingText) {
+            ratingText.textContent = 'Inicia sesión para valorar esta película';
+        }
+        return;
+    }
+    
+    // Load user's existing rating if any
+    const existingRating = getUserRatingForMovie(currentUser, movieId);
+    if (existingRating) {
+        updateStarDisplay(stars, existingRating.score);
+        if (ratingText) {
+            ratingText.textContent = `Tu valoración: ${existingRating.score}/5 estrellas`;
+        }
+    }
+    
+    // Add hover effect
+    stars.forEach(star => {
+        star.addEventListener('mouseenter', () => {
+            const rating = parseInt(star.getAttribute('data-rating'));
+            updateStarDisplay(stars, rating, true);
+        });
+    });
+    
+    // Reset on mouse leave
+    if (starContainer) {
+        starContainer.addEventListener('mouseleave', () => {
+            const currentRating = existingRating ? existingRating.score : 0;
+            updateStarDisplay(stars, currentRating);
+        });
+    }
+    
+    // Handle click to save rating
+    stars.forEach(star => {
+        star.addEventListener('click', async () => {
+            const rating = parseInt(star.getAttribute('data-rating'));
+            await saveMovieRating(movieId, rating);
+        });
+    });
+}
+
+/**
+ * Update star display
+ */
+function updateStarDisplay(stars, rating, isHover = false) {
+    stars.forEach(star => {
+        const starRating = parseInt(star.getAttribute('data-rating'));
+        if (starRating <= rating) {
+            star.classList.remove('far');
+            star.classList.add('fas');
+            if (isHover) {
+                star.style.color = '#f5c518';
+            } else {
+                star.style.color = '#21d07a';
+            }
+        } else {
+            star.classList.remove('fas');
+            star.classList.add('far');
+            star.style.color = '';
+        }
+    });
+}
+
+/**
+ * Get user's rating for a specific movie
+ */
+function getUserRatingForMovie(user, movieId) {
+    if (!user.ratings || user.ratings.length === 0) return null;
+    return user.ratings.find(rating => rating.movieId === parseInt(movieId));
+}
+
+/**
+ * Save movie rating
+ */
+async function saveMovieRating(movieId, score) {
+    const currentUser = getCurrentUser();
+    
+    if (!currentUser) {
+        showToast('Por favor, inicia sesión para valorar películas', 'warning');
+        return;
+    }
+    
+    try {
+        // Initialize ratings array if it doesn't exist
+        if (!currentUser.ratings) {
+            currentUser.ratings = [];
+        }
+        
+        // Check if rating already exists
+        const existingRatingIndex = currentUser.ratings.findIndex(r => r.movieId === parseInt(movieId));
+        
+        const newRating = {
+            movieId: parseInt(movieId),
+            score: score,
+            date: new Date().toISOString()
+        };
+        
+        let updatedRatings;
+        if (existingRatingIndex > -1) {
+            // Update existing rating
+            updatedRatings = [...currentUser.ratings];
+            updatedRatings[existingRatingIndex] = newRating;
+        } else {
+            // Add new rating
+            updatedRatings = [...currentUser.ratings, newRating];
+        }
+        
+        // Update user in json-server
+        const response = await fetch(`http://localhost:3000/usuarios/${currentUser.id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ ratings: updatedRatings })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Error al guardar la valoración');
+        }
+        
+        // Update localStorage
+        currentUser.ratings = updatedRatings;
+        updateCurrentUser(currentUser);
+        
+        // Update UI
+        const stars = document.querySelectorAll('.star-rating .star');
+        const ratingText = document.querySelector('.rating-text');
+        updateStarDisplay(stars, score);
+        if (ratingText) {
+            ratingText.textContent = `Tu valoración: ${score}/5 estrellas`;
+        }
+        
+        showToast(`¡Película valorada con ${score} estrellas!`, 'success');
+        
+    } catch (error) {
+        console.error('Error saving rating:', error);
+        showToast('Hubo un error al guardar tu valoración. Por favor, verifica que json-server esté ejecutándose.', 'error');
+    }
 }
 
 // ============ FAVORITES FUNCTIONS ============

@@ -1289,3 +1289,44 @@
 .btn-load-more i {
     font-size: 1.1rem;
 }
+
+/* ========================================
+   STAR RATING SYSTEM
+   ======================================== */
+
+.star-rating-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background: rgba(3, 37, 65, 0.05);
+    border-radius: 12px;
+    margin: 10px 0;
+}
+
+.star-rating {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.star-rating .star {
+    font-size: 2.5rem;
+    color: #ccc;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.star-rating .star:hover {
+    transform: scale(1.2);
+}
+
+.star-rating .star.fas {
+    color: #21d07a;
+}
+
+.rating-text {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
