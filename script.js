@@ -326,6 +326,165 @@ const TRANSLATIONS = {
         movie_seasons: 'Number of Seasons',
         movie_episodes: 'Number of Episodes',
         movie_keywords: 'Keywords'
+    },
+    'fr': {
+        nav_movies: 'Films',
+        nav_series: 'Séries',
+        nav_people: 'Personnes',
+        nav_more: 'Plus',
+        nav_login: 'Se connecter',
+        nav_join: 'Rejoindre PFHR',
+        hero_title: 'Bienvenue.',
+        hero_subtitle: 'Des millions de films, séries et personnes à découvrir. Explorez maintenant.',
+        search_btn: 'Rechercher',
+        search_placeholder: 'Rechercher un film, une série, une personne...',
+        section_favorites: 'Mes Favoris',
+        section_trending: 'Tendances',
+        section_popular: 'Populaires',
+        section_trailers: 'Dernières Bandes-annonces',
+        time_day: "Aujourd'hui",
+        time_week: 'Cette semaine',
+        cat_streaming: 'Streaming',
+        cat_tv: 'À la télé',
+        cat_rent: 'À louer',
+        cat_theaters: 'Au cinéma',
+        empty_favorites: "Vous n'avez pas encore ajouté de favoris.",
+        // Movies dropdown
+        movies_popular: 'Populaire',
+        movies_now_playing: 'À l\'affiche',
+        movies_upcoming: 'À venir',
+        movies_top_rated: 'Les mieux notés',
+        // TV Shows dropdown
+        tv_popular: 'Populaire',
+        tv_airing_today: 'Diffusé aujourd\'hui',
+        tv_on_the_air: 'À la télévision',
+        tv_top_rated: 'Les mieux notés',
+        // People dropdown
+        people_popular: 'Populaire',
+        // More dropdown
+        more_debates: 'Débats',
+        more_leaderboard: 'Classement',
+        more_support: 'Support',
+        // Auth forms
+        auth_login_title: 'Se connecter',
+        auth_login_subtitle: 'Accédez à votre compte pour profiter de toutes les fonctionnalités',
+        auth_email_label: 'Adresse e-mail',
+        auth_password_label: 'Mot de passe',
+        auth_login_button: 'Se connecter',
+        auth_no_account: "Vous n'avez pas de compte?",
+        auth_register_link: 'Inscrivez-vous ici',
+        auth_register_title: 'Créer un compte',
+        auth_register_subtitle: 'Rejoignez notre communauté d\'amateurs de cinéma',
+        auth_name_label: 'Nom complet',
+        auth_confirm_password_label: 'Confirmer le mot de passe',
+        auth_register_button: 'Créer un compte',
+        auth_have_account: 'Vous avez déjà un compte?',
+        auth_login_link: 'Connectez-vous ici',
+        auth_email_placeholder: 'votre@email.com',
+        auth_password_placeholder: 'Votre mot de passe',
+        auth_name_placeholder: 'Votre nom complet',
+        auth_password_min_placeholder: 'Minimum 6 caractères',
+        auth_confirm_password_placeholder: 'Répétez votre mot de passe',
+        auth_logout_button: 'Se déconnecter',
+        // Footer translations
+        footer_about: 'À propos de PFHR',
+        footer_support: 'Contacter le support',
+        footer_api: 'API',
+        footer_blog: 'Blog',
+        footer_participate: 'Participer',
+        footer_forums: 'Forums de discussion',
+        footer_contribute: 'Contribuer',
+        footer_guide: 'Guide de contribution',
+        footer_community: 'Communauté',
+        footer_guidelines: 'Directives',
+        footer_twitter: 'Twitter',
+        footer_facebook: 'Facebook',
+        footer_legal: 'Légal',
+        footer_terms: "Conditions d'utilisation",
+        footer_privacy: 'Politique de confidentialité',
+        footer_copyright: '© 2025 PFHR. Tous droits réservés.',
+        // About modal
+        about_modal_title: 'À propos de PFHR',
+        about_lead: 'PFHR est une plateforme web moderne dédiée aux amateurs de cinéma et de séries télévisées.',
+        about_what_title: 'Qu\'est-ce que PFHR?',
+        about_what_text: 'PFHR (Películas, Films, Hollywood & Reviews) est une application web qui vous permet d\'explorer, de découvrir et d\'organiser votre contenu audiovisuel favori. Avec une interface intuitive et élégante, vous pouvez accéder à des informations détaillées sur des milliers de films, séries télévisées et personnalités du monde du divertissement.',
+        about_features_title: 'Caractéristiques principales',
+        about_feature_search: 'Recherche avancée:',
+        about_feature_search_desc: 'Trouvez facilement des films, séries et personnes',
+        about_feature_info: 'Informations détaillées:',
+        about_feature_info_desc: 'Synopsis, casting, notes et plus',
+        about_feature_trends: 'Tendances:',
+        about_feature_trends_desc: 'Restez à jour avec le plus populaire',
+        about_feature_favorites: 'Liste de favoris:',
+        about_feature_favorites_desc: 'Sauvegardez vos films et séries préférés',
+        about_feature_trailers: 'Bandes-annonces:',
+        about_feature_trailers_desc: 'Regardez les bandes-annonces directement sur la plateforme',
+        about_feature_recommendations: 'Recommandations:',
+        about_feature_recommendations_desc: 'Découvrez du contenu similaire à vos favoris',
+        about_tech_title: 'Technologie',
+        about_tech_text: 'PFHR est construit avec les dernières technologies web et utilise l\'API de The Movie Database (TMDB) pour fournir des informations à jour et précises sur le contenu audiovisuel.',
+        about_mission_title: 'Notre mission',
+        about_mission_text: 'Rendre l\'expérience de découverte et de plaisir du contenu audiovisuel plus accessible, organisée et agréable pour tous les utilisateurs.',
+        about_version: 'Version:',
+        about_updated: 'Dernière mise à jour:',
+        about_date: 'Novembre 2024',
+        // Support modal
+        support_modal_title: 'Contacter le support',
+        support_intro: 'Avez-vous des questions ou besoin d\'aide? Remplissez le formulaire et nous vous recontacterons dès que possible.',
+        support_name_label: 'Nom complet *',
+        support_email_label: 'E-mail *',
+        support_reason_label: 'Motif de la demande *',
+        support_subject_label: 'Sujet *',
+        support_message_label: 'Message *',
+        support_name_placeholder: 'Votre nom',
+        support_email_placeholder: 'votre@email.com',
+        support_subject_placeholder: 'Sujet de votre demande',
+        support_message_placeholder: 'Décrivez votre demande avec le plus de détails possible...',
+        support_reason_select: 'Sélectionnez un motif',
+        support_reason_technical: 'Problème technique',
+        support_reason_account: 'Problème avec mon compte',
+        support_reason_suggestion: 'Suggestion ou amélioration',
+        support_reason_content: 'Contenu manquant ou incorrect',
+        support_reason_billing: 'Demande de facturation',
+        support_reason_other: 'Autre',
+        support_submit_btn: 'Envoyer la demande',
+        support_cancel_btn: 'Annuler',
+        // Project info modal
+        project_info_link: 'Cliquez pour plus d\'informations sur le projet',
+        project_modal_title: 'Informations sur le projet',
+        project_designer_title: 'Concepteur du projet',
+        project_designer_name: 'Hugo Rollán Agudo',
+        project_linkedin: 'LinkedIn',
+        project_instagram: 'Instagram',
+        project_error_loading: 'Erreur lors du chargement des informations du projet.',
+        // Movie/TV details modal
+        movie_user_score: 'Score<br>utilisateur',
+        movie_overview: 'Aperçu',
+        movie_no_synopsis: 'Aucun synopsis disponible.',
+        movie_director: 'Réalisateur',
+        movie_screenplay: 'Scénario',
+        movie_story: 'Histoire',
+        movie_trailer: 'Bande-annonce',
+        movie_main_cast: 'Distribution principale',
+        movie_no_cast: 'Aucune information de distribution disponible.',
+        movie_reviews: 'Critiques',
+        movie_review_by: 'Une critique de',
+        movie_written_by: 'Écrit par',
+        movie_no_reviews: 'Aucune critique disponible.',
+        movie_recommendations: 'Recommandations',
+        movie_no_recommendations: 'Aucune recommandation disponible.',
+        movie_additional_info: 'Informations supplémentaires',
+        movie_original_title: 'Titre original',
+        movie_status: 'Statut',
+        movie_status_released: 'Sorti',
+        movie_status_ended: 'Terminé',
+        movie_status_returning: 'Série en cours',
+        movie_original_language: 'Langue originale',
+        movie_budget: 'Budget',
+        movie_revenue: 'Recettes',
+        movie_seasons: 'Nombre de saisons',
+        movie_episodes: 'Nombre d\'%C3%A9pisodes',
+        movie_keywords: 'Mots-clés'
     }
 };
 
@@ -2132,11 +2291,12 @@ async function openProjectInfoModal() {
         if (readmeContent) {
             try {
                 const lang = localStorage.getItem('preferredLanguage') || 'es';
-                let readmeFile = 'README.md'; // Default Spanish
-                
-                if (lang === 'en') {
-                    readmeFile = 'README-en.md';
-                }
+                const readmeFiles = {
+                    'es': 'README.md',
+                    'en': 'README-en.md',
+                    'fr': 'README-fr.md'
+                };
+                const readmeFile = readmeFiles[lang] || 'README.md';
                 
                 const response = await fetch(readmeFile);
                 const markdown = await response.text();
@@ -2238,7 +2398,8 @@ function changeLanguage(lang) {
     // 2. Actualizar botón visual
     const langMap = {
         'es': 'ES',
-        'en': 'EN'
+        'en': 'EN',
+        'fr': 'FR'
     };
     
     if (langBox) {
@@ -2281,7 +2442,8 @@ function changeLanguage(lang) {
 function showLanguageNotification(lang) {
     const langMessages = {
         'es': 'Idioma: Español🇪🇸',
-        'en': 'Language: English🇬🇧'
+        'en': 'Language: English🇬🇧',
+        'fr': 'Langue: Français🇫🇷'
     };
     
     const notification = document.createElement('div');
