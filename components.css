@@ -864,6 +864,53 @@
     pointer-events: none;
 }
 
+/* --- Watched Button --- */
+.watched-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(3, 37, 65, 0.8);
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--tmdb-white);
+    font-size: 0.9rem;
+    cursor: pointer;
+    z-index: 2;
+    opacity: 0;
+    transition: opacity var(--transition-speed), transform var(--transition-speed), background-color var(--transition-speed);
+}
+
+.card:hover .watched-btn {
+    opacity: 1;
+}
+
+.watched-btn:hover {
+    background-color: rgba(3, 37, 65, 1);
+    transform: scale(1.15);
+}
+
+.watched-btn:active {
+    transform: scale(0.95);
+}
+
+.watched-btn.watched-active {
+    background-color: var(--tmdb-light-blue);
+    opacity: 1;
+}
+
+.watched-btn.watched-active:hover {
+    background-color: #01b4e4;
+}
+
+.watched-btn i {
+    pointer-events: none;
+}
+
 /* --- Support Success Message --- */
 .support-success {
     text-align: center;
