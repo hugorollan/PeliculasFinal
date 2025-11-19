@@ -101,7 +101,8 @@ async function registerUser(name, email, password) {
             name: name.trim(),
             email: email.trim().toLowerCase(),
             password: password, // En producción, esto debería estar hasheado
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            favorites: []
         };
         
         const createResponse = await fetch(API_URL, {
@@ -322,11 +323,17 @@ function updateUIForAuthenticatedUser(user) {
     
     if (navRight) {
         // Remove login and register links
-        const loginLink = navRight.querySelector('a[href="#"]:not(.btn-join)');
+        const loginLink = navRight.querySelector('a[href="auth.html"]:not(.btn-join)');
         const joinBtn = navRight.querySelector('.btn-join');
         
         if (loginLink) loginLink.remove();
         if (joinBtn) joinBtn.remove();
+        
+        // Show favorites toggle button
+        const favoritesToggleBtn = document.getElementById('favorites-toggle-btn');
+        if (favoritesToggleBtn) {
+            favoritesToggleBtn.style.display = 'block';
+        }
         
         // Create user profile section
         const userProfile = document.createElement('div');

@@ -23,6 +23,9 @@
                 </ul>
             </div>
             <div class="nav-right">
+                <button id="favorites-toggle-btn" class="icon-btn" style="display: none;" aria-label="Mis Favoritos">
+                    <i class="fas fa-heart"></i>
+                </button>
                 <button class="icon-btn" aria-label="Añadir"><i class="fas fa-plus"></i></button>
                 <div class="lang-box" role="button" tabindex="0" aria-label="Cambiar idioma">ES</div>
                 <a href="auth.html" class="nav-link">Iniciar sesión</a>
@@ -52,6 +55,22 @@
     </header>
 
     <main>
+        <!-- Favorites Section -->
+        <section class="favorites-section" id="favorites-section" style="display: none;" aria-labelledby="favorites-title">
+            <div class="section-header">
+                <h2 id="favorites-title">Mis Favoritos</h2>
+            </div>
+
+            <div class="scroller-wrapper">
+                <div id="favorites-container" class="scroller" role="region"></div>
+                <div id="favorites-empty" class="empty-favorites" style="display: none;">
+                    <i class="fas fa-heart"></i>
+                    <p>No tienes películas favoritas aún.</p>
+                    <p class="empty-subtitle">¡Comienza a agregar películas a tu lista!</p>
+                </div>
+            </div>
+        </section>
+
         <section class="trending-section" aria-labelledby="trending-title">
             <div class="section-header">
                 <h2 id="trending-title">Tendencias</h2>

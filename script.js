@@ -94,6 +94,10 @@ function createMovieCard(movie) {
     const percent = Math.round(vote_average * 10);
     const borderColor = getRatingColor(percent);
     const dateStr = formatDate(release_date);
+    
+    // Check if movie is in favorites
+    const currentUser = getCurrentUser();
+    const isFavorite = currentUser && currentUser.favorites && currentUser.favorites.includes(id);
 
     const card = document.createElement('div');
     card.classList.add('card');
@@ -103,6 +107,9 @@ function createMovieCard(movie) {
     card.innerHTML = `
         <div class="image-content">
             <img src="${IMAGE_URL + poster_path}" alt="${title}" loading="lazy">
+            <button class="favorite-btn ${isFavorite ? 'favorite-active' : ''}" data-movie-id="${id}" aria-label="Agregar a favoritos">
+                <i class="fas fa-heart"></i>
+            </button>
             <div class="options-icon" aria-label="Opciones">
                 <i class="fas fa-ellipsis-h"></i>
             </div>
@@ -115,6 +122,13 @@ function createMovieCard(movie) {
             <p>${dateStr}</p>
         </div>
     `;
+
+    // Add click event to favorite button
+    const favoriteBtn = card.querySelector('.favorite-btn');
+    favoriteBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent card click event
+        toggleFavorite(id);
+    });
 
     // Add click event to open movie details
     card.addEventListener('click', () => openMovieDetails(id));
@@ -827,6 +841,168 @@ function displayMovieDetails(data) {
     });
 }
 
+// ============ FAVORITES FUNCTIONS ============
+
+/**
+ * Get current user from localStorage (imported from app.js context)
+ */
+function getCurrentUser() {
+    const userStr = localStorage.getItem('currentUser');
+    return userStr ? JSON.parse(userStr) : null;
+}
+
+/**
+ * Update current user in localStorage
+ */
+function updateCurrentUser(user) {
+    localStorage.setItem('currentUser', JSON.stringify(user));
+}
+
+/**
+ * Toggle favorite status for a movie
+ */
+async function toggleFavorite(movieId) {
+    const currentUser = getCurrentUser();
+    
+    // Check if user is logged in
+    if (!currentUser) {
+        alert('Por favor, inicia sesión para agregar películas a favoritos');
+        window.location.href = 'auth.html';
+        return;
+    }
+    
+    try {
+        // Initialize favorites array if it doesn't exist
+        if (!currentUser.favorites) {
+            currentUser.favorites = [];
+        }
+        
+        // Check if movie is already in favorites
+        const favoriteIndex = currentUser.favorites.indexOf(movieId);
+        let updatedFavorites;
+        
+        if (favoriteIndex > -1) {
+            // Remove from favorites
+            updatedFavorites = currentUser.favorites.filter(id => id !== movieId);
+        } else {
+            // Add to favorites
+            updatedFavorites = [...currentUser.favorites, movieId];
+        }
+        
+        // Update user in json-server
+        const response = await fetch(`http://localhost:3000/usuarios/${currentUser.id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ favorites: updatedFavorites })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Error al actualizar favoritos');
+        }
+        
+        // Update localStorage
+        currentUser.favorites = updatedFavorites;
+        updateCurrentUser(currentUser);
+        
+        // Update UI - find all favorite buttons for this movie and update them
+        const favoriteButtons = document.querySelectorAll(`.favorite-btn[data-movie-id="${movieId}"]`);
+        favoriteButtons.forEach(btn => {
+            if (favoriteIndex > -1) {
+                btn.classList.remove('favorite-active');
+            } else {
+                btn.classList.add('favorite-active');
+            }
+        });
+        
+        // If we're viewing favorites section, reload it
+        const favoritesSection = document.getElementById('favorites-section');
+        if (favoritesSection && favoritesSection.style.display !== 'none') {
+            loadFavorites();
+        }
+        
+    } catch (error) {
+        console.error('Error toggling favorite:', error);
+        alert('Hubo un error al actualizar los favoritos. Por favor, verifica que json-server esté ejecutándose.');
+    }
+}
+
+/**
+ * Load and display user's favorite movies
+ */
+async function loadFavorites() {
+    const currentUser = getCurrentUser();
+    const favoritesContainer = document.getElementById('favorites-container');
+    const favoritesEmpty = document.getElementById('favorites-empty');
+    
+    if (!currentUser) {
+        return;
+    }
+    
+    // Initialize favorites array if it doesn't exist
+    if (!currentUser.favorites || currentUser.favorites.length === 0) {
+        favoritesContainer.innerHTML = '';
+        favoritesEmpty.style.display = 'flex';
+        return;
+    }
+    
+    try {
+        favoritesEmpty.style.display = 'none';
+        favoritesContainer.innerHTML = '<div class="loading-spinner"><div class="spinner"></div><p>Cargando favoritos...</p></div>';
+        
+        // Fetch details for all favorite movies
+        const moviePromises = currentUser.favorites.map(movieId => 
+            fetch(`${BASE_URL}/movie/${movieId}?language=es-ES`, options)
+                .then(res => res.ok ? res.json() : null)
+        );
+        
+        const movies = await Promise.all(moviePromises);
+        const validMovies = movies.filter(movie => movie !== null);
+        
+        if (validMovies.length === 0) {
+            favoritesContainer.innerHTML = '';
+            favoritesEmpty.style.display = 'flex';
+            return;
+        }
+        
+        displayMovies(validMovies, favoritesContainer);
+        
+    } catch (error) {
+        console.error('Error loading favorites:', error);
+        favoritesContainer.innerHTML = '<p style="padding: 40px; color: var(--text-secondary); text-align: center;">Error al cargar favoritos.</p>';
+    }
+}
+
+/**
+ * Toggle favorites section visibility
+ */
+function toggleFavoritesSection() {
+    const favoritesSection = document.getElementById('favorites-section');
+    const trendingSection = document.querySelector('.trending-section');
+    const popularSection = document.querySelector('.popular-section');
+    const trailersSection = document.querySelector('.latest-trailers-section');
+    
+    if (!favoritesSection) return;
+    
+    if (favoritesSection.style.display === 'none') {
+        // Show favorites, hide other sections
+        favoritesSection.style.display = 'block';
+        trendingSection.style.display = 'none';
+        popularSection.style.display = 'none';
+        trailersSection.style.display = 'none';
+        
+        // Load favorites
+        loadFavorites();
+    } else {
+        // Hide favorites, show other sections
+        favoritesSection.style.display = 'none';
+        trendingSection.style.display = 'block';
+        popularSection.style.display = 'block';
+        trailersSection.style.display = 'block';
+    }
+}
+
 // ============ INITIALIZATION ============
 
 /**
@@ -840,6 +1016,7 @@ function init() {
     setupSearchForm();
     setupAccessibility();
     setupModalHandlers();
+    setupFavoritesToggle();
     
     // Load initial data
     getTrendingMovies('day');
@@ -847,6 +1024,24 @@ function init() {
     getUpcomingMovies();
     
     console.log('Application initialized successfully!');
+}
+
+/**
+ * Setup favorites toggle button
+ */
+function setupFavoritesToggle() {
+    const favoritesToggleBtn = document.getElementById('favorites-toggle-btn');
+    
+    if (favoritesToggleBtn) {
+        // Show button if user is logged in
+        const currentUser = getCurrentUser();
+        if (currentUser) {
+            favoritesToggleBtn.style.display = 'block';
+        }
+        
+        // Add click event
+        favoritesToggleBtn.addEventListener('click', toggleFavoritesSection);
+    }
 }
 
 /**
