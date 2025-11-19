@@ -2892,7 +2892,7 @@ function setupLanguageSelector() {
         option.addEventListener('click', (e) => {
             e.preventDefault();
             const lang = e.target.dataset.lang || e.target.parentElement.dataset.lang;
-            changeLanguage(lang);
+            changeLanguage(lang, true);
         });
     });
 }
@@ -2900,7 +2900,7 @@ function setupLanguageSelector() {
 /**
  * Change language and update UI
  */
-function changeLanguage(lang) {
+function changeLanguage(lang, showNotification = false) {
     const langBox = document.querySelector('.lang-box');
     
     // 1. Guardar preferencia
@@ -2944,8 +2944,10 @@ function changeLanguage(lang) {
     getPopularMovies();
     getUpcomingMovies();
     
-    // Notificación
-    showLanguageNotification(lang);
+    // Notificación (solo si se solicita)
+    if (showNotification) {
+        showLanguageNotification(lang);
+    }
 }
 
 /**
