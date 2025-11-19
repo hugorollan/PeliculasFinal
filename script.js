@@ -138,7 +138,35 @@ const TRANSLATIONS = {
         project_designer_name: 'Hugo Rollán Agudo',
         project_linkedin: 'LinkedIn',
         project_instagram: 'Instagram',
-        project_error_loading: 'Error al cargar la información del proyecto.'
+        project_error_loading: 'Error al cargar la información del proyecto.',
+        // Movie/TV details modal
+        movie_user_score: 'Puntuación<br>de usuarios',
+        movie_overview: 'Vista general',
+        movie_no_synopsis: 'No hay sinopsis disponible.',
+        movie_director: 'Director',
+        movie_screenplay: 'Screenplay',
+        movie_story: 'Story',
+        movie_trailer: 'Tráiler',
+        movie_main_cast: 'Reparto principal',
+        movie_no_cast: 'No hay información de reparto disponible.',
+        movie_reviews: 'Reseñas',
+        movie_review_by: 'Una reseña de',
+        movie_written_by: 'Escrito por',
+        movie_no_reviews: 'No hay reseñas disponibles.',
+        movie_recommendations: 'Recomendaciones',
+        movie_no_recommendations: 'No hay recomendaciones disponibles.',
+        movie_additional_info: 'Información adicional',
+        movie_original_title: 'Título original',
+        movie_status: 'Estado',
+        movie_status_released: 'Estrenada',
+        movie_status_ended: 'Finalizada',
+        movie_status_returning: 'En emisión',
+        movie_original_language: 'Idioma original',
+        movie_budget: 'Presupuesto',
+        movie_revenue: 'Ingresos',
+        movie_seasons: 'Número de temporadas',
+        movie_episodes: 'Número de episodios',
+        movie_keywords: 'Palabras clave'
     },
     'en': {
         nav_movies: 'Movies',
@@ -269,7 +297,35 @@ const TRANSLATIONS = {
         project_designer_name: 'Hugo Rollán Agudo',
         project_linkedin: 'LinkedIn',
         project_instagram: 'Instagram',
-        project_error_loading: 'Error loading project information.'
+        project_error_loading: 'Error loading project information.',
+        // Movie/TV details modal
+        movie_user_score: 'User<br>Score',
+        movie_overview: 'Overview',
+        movie_no_synopsis: 'No synopsis available.',
+        movie_director: 'Director',
+        movie_screenplay: 'Screenplay',
+        movie_story: 'Story',
+        movie_trailer: 'Trailer',
+        movie_main_cast: 'Main Cast',
+        movie_no_cast: 'No cast information available.',
+        movie_reviews: 'Reviews',
+        movie_review_by: 'A review by',
+        movie_written_by: 'Written by',
+        movie_no_reviews: 'No reviews available.',
+        movie_recommendations: 'Recommendations',
+        movie_no_recommendations: 'No recommendations available.',
+        movie_additional_info: 'Additional Information',
+        movie_original_title: 'Original Title',
+        movie_status: 'Status',
+        movie_status_released: 'Released',
+        movie_status_ended: 'Ended',
+        movie_status_returning: 'Returning Series',
+        movie_original_language: 'Original Language',
+        movie_budget: 'Budget',
+        movie_revenue: 'Revenue',
+        movie_seasons: 'Number of Seasons',
+        movie_episodes: 'Number of Episodes',
+        movie_keywords: 'Keywords'
     }
 };
 
@@ -343,6 +399,32 @@ function formatDate(dateString) {
     if (!dateString) return 'Fecha desconocida';
     const date = new Date(dateString);
     return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+/**
+ * Get translation for current language
+ */
+function getTranslation(key) {
+    const lang = localStorage.getItem('preferredLanguage') || 'es';
+    return TRANSLATIONS[lang]?.[key] || TRANSLATIONS['es'][key] || key;
+}
+
+/**
+ * Get status translation
+ */
+function getStatusTranslation(status) {
+    const lang = localStorage.getItem('preferredLanguage') || 'es';
+    
+    switch (status) {
+        case 'Released':
+            return getTranslation('movie_status_released');
+        case 'Ended':
+            return getTranslation('movie_status_ended');
+        case 'Returning Series':
+            return getTranslation('movie_status_returning');
+        default:
+            return status;
+    }
 }
 
 /**
@@ -1313,33 +1395,33 @@ function displayMovieDetails(data) {
                             <span class="score-number">${votePercent}</span>
                             <span class="score-percent">%</span>
                         </div>
-                        <span class="score-label">Puntuación<br>de usuarios</span>
+                        <span class="score-label">${getTranslation('movie_user_score')}</span>
                     </div>
                     
                     ${details.tagline ? `<div class="movie-tagline">${details.tagline}</div>` : ''}
                     
                     <div class="movie-overview-section">
-                        <h3>Vista general</h3>
-                        <p>${details.overview || 'No hay sinopsis disponible.'}</p>
+                        <h3>${getTranslation('movie_overview')}</h3>
+                        <p>${details.overview || getTranslation('movie_no_synopsis')}</p>
                     </div>
                     
                     <div class="movie-credits-featured">
                         ${director ? `
                             <div class="credit-item">
                                 <h4>${director.name}</h4>
-                                <p>Director</p>
+                                <p>${getTranslation('movie_director')}</p>
                             </div>
                         ` : ''}
                         ${screenplay.map(person => `
                             <div class="credit-item">
                                 <h4>${person.name}</h4>
-                                <p>Screenplay</p>
+                                <p>${getTranslation('movie_screenplay')}</p>
                             </div>
                         `).join('')}
                         ${story.map(person => `
                             <div class="credit-item">
                                 <h4>${person.name}</h4>
-                                <p>Story</p>
+                                <p>${getTranslation('movie_story')}</p>
                             </div>
                         `).join('')}
                     </div>
@@ -1352,7 +1434,7 @@ function displayMovieDetails(data) {
             <!-- trailerKey is safe to use here as it's validated with YOUTUBE_VIDEO_ID_REGEX -->
             ${trailerKey ? `
                 <div class="detail-section">
-                    <h2>Tráiler</h2>
+                    <h2>${getTranslation('movie_trailer')}</h2>
                     <div class="trailer-player">
                         <iframe
                             width="100%"
@@ -1371,7 +1453,7 @@ function displayMovieDetails(data) {
             
             <!-- Cast Section -->
             <div class="detail-section">
-                <h2>Reparto principal</h2>
+                <h2>${getTranslation('movie_main_cast')}</h2>
                 ${credits.cast.length > 0 ? `
                     <div class="cast-scroller">
                         ${credits.cast.slice(0, 10).map(person => `
@@ -1392,12 +1474,12 @@ function displayMovieDetails(data) {
                             </div>
                         `).join('')}
                     </div>
-                ` : '<div class="no-content">No hay información de reparto disponible.</div>'}
+                ` : `<div class="no-content">${getTranslation('movie_no_cast')}</div>`}
             </div>
             
             <!-- Reviews Section -->
             <div class="detail-section">
-                <h2>Reseñas</h2>
+                <h2>${getTranslation('movie_reviews')}</h2>
                 ${reviews.results.length > 0 ? `
                     ${reviews.results.slice(0, 3).map(review => `
                         <div class="review-card">
@@ -1412,8 +1494,8 @@ function displayMovieDetails(data) {
                                     `}
                                 </div>
                                 <div class="review-author-info">
-                                    <h4>Una reseña de ${review.author}</h4>
-                                    <div class="review-date">Escrito por ${review.author} el ${formatDate(review.created_at)}</div>
+                                    <h4>${getTranslation('movie_review_by')} ${review.author}</h4>
+                                    <div class="review-date">${getTranslation('movie_written_by')} ${review.author} ${formatDate(review.created_at)}</div>
                                 </div>
                             </div>
                             <div class="review-content">
@@ -1421,12 +1503,12 @@ function displayMovieDetails(data) {
                             </div>
                         </div>
                     `).join('')}
-                ` : '<div class="no-content">No hay reseñas disponibles.</div>'}
+                ` : `<div class="no-content">${getTranslation('movie_no_reviews')}</div>`}
             </div>
             
             <!-- Recommendations Section -->
             <div class="detail-section">
-                <h2>Recomendaciones</h2>
+                <h2>${getTranslation('movie_recommendations')}</h2>
                 ${recommendations.results.length > 0 ? `
                     <div class="recommendations-scroller">
                         ${recommendations.results.slice(0, 10).map(item => {
@@ -1446,41 +1528,41 @@ function displayMovieDetails(data) {
                             `;
                         }).join('')}
                     </div>
-                ` : '<div class="no-content">No hay recomendaciones disponibles.</div>'}
+                ` : `<div class="no-content">${getTranslation('movie_no_recommendations')}</div>`}
             </div>
             
             <!-- Additional Information -->
             <div class="detail-section">
-                <h2>Información adicional</h2>
+                <h2>${getTranslation('movie_additional_info')}</h2>
                 <div class="info-grid">
                     <div class="info-item">
-                        <h4>Título original</h4>
+                        <h4>${getTranslation('movie_original_title')}</h4>
                         <p>${type === 'movie' ? details.original_title : details.original_name}</p>
                     </div>
                     <div class="info-item">
-                        <h4>Estado</h4>
-                        <p>${details.status === 'Released' ? 'Estrenada' : (details.status === 'Ended' ? 'Finalizada' : (details.status === 'Returning Series' ? 'En emisión' : details.status))}</p>
+                        <h4>${getTranslation('movie_status')}</h4>
+                        <p>${getStatusTranslation(details.status)}</p>
                     </div>
                     <div class="info-item">
-                        <h4>Idioma original</h4>
+                        <h4>${getTranslation('movie_original_language')}</h4>
                         <p>${details.original_language.toUpperCase()}</p>
                     </div>
                     ${type === 'movie' ? `
                         <div class="info-item">
-                            <h4>Presupuesto</h4>
+                            <h4>${getTranslation('movie_budget')}</h4>
                             <p>${budgetFormatted}</p>
                         </div>
                         <div class="info-item">
-                            <h4>Ingresos</h4>
+                            <h4>${getTranslation('movie_revenue')}</h4>
                             <p>${revenueFormatted}</p>
                         </div>
                     ` : `
                         <div class="info-item">
-                            <h4>Número de temporadas</h4>
+                            <h4>${getTranslation('movie_seasons')}</h4>
                             <p>${details.number_of_seasons || 'N/A'}</p>
                         </div>
                         <div class="info-item">
-                            <h4>Número de episodios</h4>
+                            <h4>${getTranslation('movie_episodes')}</h4>
                             <p>${details.number_of_episodes || 'N/A'}</p>
                         </div>
                     `}
@@ -1490,12 +1572,12 @@ function displayMovieDetails(data) {
             <!-- Keywords Section -->
             ${keywords.keywords && keywords.keywords.length > 0 ? `
                 <div class="detail-section">
-                    <h2>Palabras clave</h2>
+                    <h2>${getTranslation('movie_keywords')}</h2>
                     <div class="keywords-list" id="keywords-list-container"></div>
                 </div>
             ` : (keywords.results && keywords.results.length > 0 ? `
                 <div class="detail-section">
-                    <h2>Palabras clave</h2>
+                    <h2>${getTranslation('movie_keywords')}</h2>
                     <div class="keywords-list" id="keywords-list-container"></div>
                 </div>
             ` : '')}
