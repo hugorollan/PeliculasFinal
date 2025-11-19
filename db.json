@@ -11,7 +11,34 @@
         680,
         27205
       ],
-      "ratings": []
+      "ratings": [
+        {
+          "movieId": 550,
+          "type": "movie",
+          "score": 5,
+          "date": "2025-11-19T20:00:00.000Z"
+        },
+        {
+          "movieId": 680,
+          "type": "movie",
+          "score": 4,
+          "date": "2025-11-19T20:00:00.000Z"
+        }
+      ],
+      "watchlist": [
+        {
+          "id": 550,
+          "type": "movie"
+        },
+        {
+          "id": 680,
+          "type": "movie"
+        }
+      ],
+      "tvFavorites": [
+        1399,
+        94605
+      ]
     },
     {
       "name": "hugorollan",
