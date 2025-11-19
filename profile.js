@@ -110,7 +110,14 @@ function updateProfileHeader(user) {
     const memberSinceDate = document.getElementById('member-since-date');
     
     if (avatarLetter) {
-        avatarLetter.textContent = user.name.charAt(0).toUpperCase();
+        // Check if user has a custom avatar icon
+        if (user.avatarIcon) {
+            avatarLetter.innerHTML = `<i class="${user.avatarIcon}"></i>`;
+            avatarLetter.style.fontSize = '3.5rem';
+        } else {
+            avatarLetter.textContent = user.name.charAt(0).toUpperCase();
+            avatarLetter.style.fontSize = '3rem';
+        }
     }
     
     if (profileName) {
@@ -276,6 +283,8 @@ async function loadUserFavorites(user) {
 function createFavoriteMovieCard(item, type = 'movie') {
     const card = document.createElement('div');
     card.className = 'favorite-movie-card';
+    card.dataset.itemId = item.id;
+    card.dataset.itemType = type;
     
     const poster = document.createElement('div');
     poster.className = 'favorite-movie-poster';
@@ -287,6 +296,21 @@ function createFavoriteMovieCard(item, type = 'movie') {
         img.loading = 'lazy';
         poster.appendChild(img);
     }
+    
+    // Add delete button
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'favorite-delete-btn';
+    deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+    deleteBtn.title = 'Eliminar de favoritos';
+    deleteBtn.setAttribute('aria-label', 'Eliminar de favoritos');
+    
+    // Handle delete button click
+    deleteBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        removeFavoriteFromProfile(item.id, type, card);
+    });
+    
+    poster.appendChild(deleteBtn);
     
     const info = document.createElement('div');
     info.className = 'favorite-movie-info';
@@ -390,9 +414,175 @@ async function loadWatchlist(user) {
     }
 }
 
+// ============ AVATAR MODAL FUNCTIONS ============
+
+/**
+ * Open avatar selection modal
+ */
+function openAvatarModal() {
+    const modal = document.getElementById('avatar-modal');
+    if (modal) {
+        modal.style.display = 'flex';
+    }
+}
+
+/**
+ * Close avatar selection modal
+ */
+function closeAvatarModal() {
+    const modal = document.getElementById('avatar-modal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+/**
+ * Update user avatar
+ */
+async function updateUserAvatar(iconClass) {
+    const currentUser = getCurrentUser();
+    if (!currentUser) return;
+    
+    try {
+        // Update user in json-server
+        const response = await fetch(`http://localhost:3000/usuarios/${currentUser.id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ avatarIcon: iconClass })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Error al actualizar el avatar');
+        }
+        
+        const updatedUser = await response.json();
+        
+        // Update localStorage
+        updateCurrentUser(updatedUser);
+        
+        // Update UI
+        updateProfileHeader(updatedUser);
+        
+        // Show success message
+        showToast('Avatar actualizado correctamente', 'success');
+        
+        // Close modal
+        closeAvatarModal();
+        
+    } catch (error) {
+        console.error('Error updating avatar:', error);
+        showToast('Error al actualizar el avatar', 'error');
+    }
+}
+
+// ============ FAVORITES MANAGEMENT FUNCTIONS ============
+
+/**
+ * Remove favorite from profile
+ */
+async function removeFavoriteFromProfile(itemId, type, cardElement) {
+    // Ask for confirmation
+    if (!confirm('¿Estás seguro de que quieres eliminar este elemento de tus favoritos?')) {
+        return;
+    }
+    
+    const currentUser = getCurrentUser();
+    if (!currentUser) return;
+    
+    try {
+        // Determine which favorites array to update
+        const favoritesKey = type === 'movie' ? 'favorites' : 'tvFavorites';
+        const currentFavorites = currentUser[favoritesKey] || [];
+        
+        // Remove the item from favorites
+        const updatedFavorites = currentFavorites.filter(id => id !== itemId);
+        
+        // Update user in json-server
+        const response = await fetch(`http://localhost:3000/usuarios/${currentUser.id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ [favoritesKey]: updatedFavorites })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Error al eliminar de favoritos');
+        }
+        
+        const updatedUser = await response.json();
+        
+        // Update localStorage
+        updateCurrentUser(updatedUser);
+        
+        // Animate card removal
+        cardElement.classList.add('favorite-card-removing');
+        
+        // Remove card after animation
+        setTimeout(() => {
+            cardElement.remove();
+            
+            // Check if favorites container is now empty
+            const favoritesContainer = document.getElementById('profile-favorites-container');
+            if (favoritesContainer && favoritesContainer.children.length === 0) {
+                favoritesContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-heart"></i>
+                        <p>No tienes películas o series favoritas aún.</p>
+                        <a href="index.html" class="btn-primary-small">Explorar contenido</a>
+                    </div>
+                `;
+            }
+            
+            // Update statistics
+            loadUserStatistics(updatedUser);
+            
+        }, 300);
+        
+        // Show success message
+        showToast('Eliminado de favoritos', 'success');
+        
+    } catch (error) {
+        console.error('Error removing favorite:', error);
+        showToast('Error al eliminar de favoritos', 'error');
+    }
+}
+
 // ============ INITIALIZATION ============
 
 // Check auth status and initialize profile on page load
 document.addEventListener('DOMContentLoaded', () => {
     initializeProfile();
+    
+    // Setup avatar modal
+    const profileAvatar = document.getElementById('profile-avatar');
+    if (profileAvatar) {
+        profileAvatar.addEventListener('click', openAvatarModal);
+    }
+    
+    // Setup avatar modal close button
+    const avatarModal = document.getElementById('avatar-modal');
+    if (avatarModal) {
+        const closeBtn = avatarModal.querySelector('.modal-close');
+        const overlay = avatarModal.querySelector('.modal-overlay');
+        
+        if (closeBtn) {
+            closeBtn.addEventListener('click', closeAvatarModal);
+        }
+        
+        if (overlay) {
+            overlay.addEventListener('click', closeAvatarModal);
+        }
+    }
+    
+    // Setup avatar selection buttons
+    const avatarOptions = document.querySelectorAll('.avatar-option');
+    avatarOptions.forEach(option => {
+        option.addEventListener('click', () => {
+            const iconClass = option.dataset.icon;
+            updateUserAvatar(iconClass);
+        });
+    });
 });
