@@ -175,29 +175,29 @@
             <div class="info-modal-body">
                 <h2><i class="fas fa-info-circle"></i> <span data-i18n="about_modal_title">Acerca de PFHR</span></h2>
                 <div class="about-content">
-                    <p class="lead">PFHR es una plataforma web moderna dedicada a los amantes del cine y las series de televisión.</p>
+                    <p class="lead" data-i18n="about_lead">PFHR es una plataforma web moderna dedicada a los amantes del cine y las series de televisión.</p>
                     
-                    <h3>¿Qué es PFHR?</h3>
-                    <p>PFHR (Películas, Films, Hollywood & Reviews) es una aplicación web que te permite explorar, descubrir y organizar tu contenido audiovisual favorito. Con una interfaz intuitiva y elegante, puedes acceder a información detallada sobre miles de películas, series de televisión y personalidades del mundo del entretenimiento.</p>
+                    <h3 data-i18n="about_what_title">¿Qué es PFHR?</h3>
+                    <p data-i18n="about_what_text">PFHR (Películas, Films, Hollywood & Reviews) es una aplicación web que te permite explorar, descubrir y organizar tu contenido audiovisual favorito. Con una interfaz intuitiva y elegante, puedes acceder a información detallada sobre miles de películas, series de televisión y personalidades del mundo del entretenimiento.</p>
                     
-                    <h3>Características principales</h3>
+                    <h3 data-i18n="about_features_title">Características principales</h3>
                     <ul class="features-list">
-                        <li><i class="fas fa-check-circle"></i> <strong>Búsqueda avanzada:</strong> Encuentra fácilmente películas, series y personas</li>
-                        <li><i class="fas fa-check-circle"></i> <strong>Información detallada:</strong> Sinopsis, reparto, valoraciones y más</li>
-                        <li><i class="fas fa-check-circle"></i> <strong>Tendencias:</strong> Mantente al día con lo más popular</li>
-                        <li><i class="fas fa-check-circle"></i> <strong>Lista de favoritos:</strong> Guarda tus películas y series preferidas</li>
-                        <li><i class="fas fa-check-circle"></i> <strong>Tráilers:</strong> Visualiza tráilers directamente en la plataforma</li>
-                        <li><i class="fas fa-check-circle"></i> <strong>Recomendaciones:</strong> Descubre contenido similar a tus favoritos</li>
+                        <li><i class="fas fa-check-circle"></i> <strong data-i18n="about_feature_search">Búsqueda avanzada:</strong> <span data-i18n="about_feature_search_desc">Encuentra fácilmente películas, series y personas</span></li>
+                        <li><i class="fas fa-check-circle"></i> <strong data-i18n="about_feature_info">Información detallada:</strong> <span data-i18n="about_feature_info_desc">Sinopsis, reparto, valoraciones y más</span></li>
+                        <li><i class="fas fa-check-circle"></i> <strong data-i18n="about_feature_trends">Tendencias:</strong> <span data-i18n="about_feature_trends_desc">Mantente al día con lo más popular</span></li>
+                        <li><i class="fas fa-check-circle"></i> <strong data-i18n="about_feature_favorites">Lista de favoritos:</strong> <span data-i18n="about_feature_favorites_desc">Guarda tus películas y series preferidas</span></li>
+                        <li><i class="fas fa-check-circle"></i> <strong data-i18n="about_feature_trailers">Tráilers:</strong> <span data-i18n="about_feature_trailers_desc">Visualiza tráilers directamente en la plataforma</span></li>
+                        <li><i class="fas fa-check-circle"></i> <strong data-i18n="about_feature_recommendations">Recomendaciones:</strong> <span data-i18n="about_feature_recommendations_desc">Descubre contenido similar a tus favoritos</span></li>
                     </ul>
                     
-                    <h3>Tecnología</h3>
-                    <p>PFHR está construido con las últimas tecnologías web y utiliza la API de The Movie Database (TMDB) para proporcionar información actualizada y precisa sobre el contenido audiovisual.</p>
+                    <h3 data-i18n="about_tech_title">Tecnología</h3>
+                    <p data-i18n="about_tech_text">PFHR está construido con las últimas tecnologías web y utiliza la API de The Movie Database (TMDB) para proporcionar información actualizada y precisa sobre el contenido audiovisual.</p>
                     
-                    <h3>Nuestra misión</h3>
-                    <p>Hacer que la experiencia de descubrir y disfrutar contenido audiovisual sea más accesible, organizada y placentera para todos los usuarios.</p>
+                    <h3 data-i18n="about_mission_title">Nuestra misión</h3>
+                    <p data-i18n="about_mission_text">Hacer que la experiencia de descubrir y disfrutar contenido audiovisual sea más accesible, organizada y placentera para todos los usuarios.</p>
                     
                     <div class="about-footer">
-                        <p><strong>Versión:</strong> 1.0.0 | <strong>Última actualización:</strong> Noviembre 2024</p>
+                        <p><strong data-i18n="about_version">Versión:</strong> 1.0.0 | <strong data-i18n="about_updated">Última actualización:</strong> <span data-i18n="about_date">Noviembre 2024</span></p>
                     </div>
                 </div>
             </div>
@@ -212,78 +212,82 @@
                 <i class="fas fa-times"></i>
             </button>
             <div class="info-modal-body">
-                <h2><i class="fas fa-headset"></i> Contactar con el soporte</h2>
-                <p class="support-intro">¿Tienes alguna pregunta o necesitas ayuda? Completa el formulario y nos pondremos en contacto contigo lo antes posible.</p>
+                <h2><i class="fas fa-headset"></i> <span data-i18n="support_modal_title">Contactar con el soporte</span></h2>
+                <p class="support-intro" data-i18n="support_intro">¿Tienes alguna pregunta o necesitas ayuda? Completa el formulario y nos pondremos en contacto contigo lo antes posible.</p>
                 
                 <form id="support-form" class="support-form">
                     <div class="form-group">
                         <label for="support-name">
-                            <i class="fas fa-user"></i> Nombre completo *
+                            <i class="fas fa-user"></i> <span data-i18n="support_name_label">Nombre completo *</span>
                         </label>
                         <input 
                             type="text" 
                             id="support-name" 
                             name="name" 
                             required 
-                            placeholder="Tu nombre">
+                            placeholder="Tu nombre"
+                            data-i18n-placeholder="support_name_placeholder">
                     </div>
                     
                     <div class="form-group">
                         <label for="support-email">
-                            <i class="fas fa-envelope"></i> Email *
+                            <i class="fas fa-envelope"></i> <span data-i18n="support_email_label">Email *</span>
                         </label>
                         <input 
                             type="email" 
                             id="support-email" 
                             name="email" 
                             required 
-                            placeholder="tu@email.com">
+                            placeholder="tu@email.com"
+                            data-i18n-placeholder="support_email_placeholder">
                     </div>
                     
                     <div class="form-group">
                         <label for="support-reason">
-                            <i class="fas fa-tag"></i> Motivo de consulta *
+                            <i class="fas fa-tag"></i> <span data-i18n="support_reason_label">Motivo de consulta *</span>
                         </label>
                         <select id="support-reason" name="reason" required>
-                            <option value="">Selecciona un motivo</option>
-                            <option value="technical">Problema técnico</option>
-                            <option value="account">Problema con mi cuenta</option>
-                            <option value="suggestion">Sugerencia o mejora</option>
-                            <option value="content">Contenido faltante o incorrecto</option>
-                            <option value="billing">Consulta sobre facturación</option>
-                            <option value="other">Otro</option>
+                            <option value="" data-i18n="support_reason_select">Selecciona un motivo</option>
+                            <option value="technical" data-i18n="support_reason_technical">Problema técnico</option>
+                            <option value="account" data-i18n="support_reason_account">Problema con mi cuenta</option>
+                            <option value="suggestion" data-i18n="support_reason_suggestion">Sugerencia o mejora</option>
+                            <option value="content" data-i18n="support_reason_content">Contenido faltante o incorrecto</option>
+                            <option value="billing" data-i18n="support_reason_billing">Consulta sobre facturación</option>
+                            <option value="other" data-i18n="support_reason_other">Otro</option>
                         </select>
                     </div>
                     
                     <div class="form-group">
                         <label for="support-subject">
-                            <i class="fas fa-pen"></i> Asunto *
+                            <i class="fas fa-pen"></i> <span data-i18n="support_subject_label">Asunto *</span>
                         </label>
                         <input 
                             type="text" 
                             id="support-subject" 
                             name="subject" 
                             required 
-                            placeholder="Asunto de tu consulta">
+                            placeholder="Asunto de tu consulta"
+                            data-i18n-placeholder="support_subject_placeholder">
                     </div>
                     
                     <div class="form-group">
                         <label for="support-message">
-                            <i class="fas fa-comment-dots"></i> Mensaje *
+                            <i class="fas fa-comment-dots"></i> <span data-i18n="support_message_label">Mensaje *</span>
                         </label>
                         <textarea 
                             id="support-message" 
                             name="message" 
                             rows="6" 
                             required 
-                            placeholder="Describe tu consulta con el mayor detalle posible..."></textarea>
+                            placeholder="Describe tu consulta con el mayor detalle posible..."
+                            data-i18n-placeholder="support_message_placeholder"></textarea>
                     </div>
                     
                     <div class="form-actions">
                         <button type="submit" class="btn-submit">
-                            <i class="fas fa-paper-plane"></i> Enviar consulta
+                            <i class="fas fa-paper-plane"></i> <span data-i18n="support_submit_btn">Enviar consulta</span>
                         </button>
-                        <button type="button" class="btn-cancel" id="support-cancel">
+                        <button type="button" class="btn-cancel" id="support-cancel" data-i18n="support_cancel_btn">
                             Cancelar
                         </button>
                     </div>
@@ -291,9 +295,9 @@
                 
                 <div id="support-success" class="support-success" style="display: none;">
                     <i class="fas fa-check-circle"></i>
-                    <h3>¡Mensaje enviado correctamente!</h3>
-                    <p>Hemos recibido tu consulta. Nuestro equipo de soporte te responderá en un plazo de 24-48 horas.</p>
-                    <button class="btn-close-success" id="close-success">Cerrar</button>
+                    <h3 data-i18n="support_success_title">¡Mensaje enviado correctamente!</h3>
+                    <p data-i18n="support_success_message">Hemos recibido tu consulta. Nuestro equipo de soporte te responderá en un plazo de 24-48 horas.</p>
+                    <button class="btn-close-success" id="close-success" data-i18n="support_close_btn">Cerrar</button>
                 </div>
             </div>
         </div>
