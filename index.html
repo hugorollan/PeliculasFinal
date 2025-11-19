@@ -56,8 +56,21 @@
                 <button id="favorites-toggle-btn" class="icon-btn" style="display: none;" aria-label="Mis Favoritos">
                     <i class="fas fa-heart"></i>
                 </button>
-                <button class="icon-btn" aria-label="Añadir"><i class="fas fa-plus"></i></button>
-                <div class="lang-box" role="button" tabindex="0" aria-label="Cambiar idioma">ES</div>
+                <div class="dropdown">
+                    <button id="info-btn" class="icon-btn" aria-label="Añadir"><i class="fas fa-plus"></i></button>
+                    <div class="dropdown-content info-tooltip">
+                        <a href="#" id="project-info-link">Pulse para más información del proyecto</a>
+                    </div>
+                </div>
+                <div class="dropdown">
+                    <div class="lang-box" role="button" tabindex="0" aria-label="Cambiar idioma">ES</div>
+                    <div class="dropdown-content lang-dropdown">
+                        <a href="#" data-lang="es">🇪🇸 Español</a>
+                        <a href="#" data-lang="en">🇬🇧 English</a>
+                        <a href="#" data-lang="fr">🇫🇷 Français</a>
+                        <a href="#" data-lang="de">🇩🇪 Deutsch</a>
+                    </div>
+                </div>
                 <a href="auth.html" class="nav-link">Iniciar sesión</a>
                 <a href="auth.html" class="nav-link btn-join">Únete a PFHR</a>
                 <button class="icon-btn search-icon-nav" id="search-toggle-btn" aria-label="Buscar"><i class="fas fa-search"></i></button>
@@ -385,6 +398,35 @@
                     <h3>¡Mensaje enviado correctamente!</h3>
                     <p>Hemos recibido tu consulta. Nuestro equipo de soporte te responderá en un plazo de 24-48 horas.</p>
                     <button class="btn-close-success" id="close-success">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Project Info Modal (README) -->
+    <div id="project-info-modal" class="modal" style="display: none;">
+        <div class="modal-overlay"></div>
+        <div class="modal-content info-modal readme-modal">
+            <button class="modal-close" aria-label="Cerrar">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="info-modal-body">
+                <h2><i class="fas fa-info-circle"></i> Información del Proyecto</h2>
+                <div class="readme-content" id="readme-content">
+                    <!-- README content will be loaded here -->
+                </div>
+                <div class="project-credits">
+                    <hr>
+                    <h3><i class="fas fa-user-circle"></i> Diseñador del Proyecto</h3>
+                    <p class="designer-name">Hugo Rollán Agudo</p>
+                    <div class="social-links">
+                        <a href="https://www.linkedin.com/in/hugo-rollan-agudo" target="_blank" rel="noopener noreferrer" class="social-link linkedin">
+                            <i class="fab fa-linkedin"></i> LinkedIn
+                        </a>
+                        <a href="https://www.instagram.com/hugorollan/" target="_blank" rel="noopener noreferrer" class="social-link instagram">
+                            <i class="fab fa-instagram"></i> Instagram
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
