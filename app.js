@@ -390,5 +390,14 @@ if (window.location.pathname.endsWith('auth.html')) {
     const currentUser = getCurrentUser();
     if (currentUser) {
         window.location.href = 'index.html';
+    } else {
+        // Check if URL has mode=register parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const mode = urlParams.get('mode');
+        
+        if (mode === 'register' && loginFormContainer && registerFormContainer) {
+            loginFormContainer.style.display = 'none';
+            registerFormContainer.style.display = 'block';
+        }
     }
 }
