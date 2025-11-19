@@ -1446,6 +1446,11 @@ function init() {
     setupModalHandlers();
     setupFavoritesToggle();
     setupInfoModals();
+    setupProjectInfoModal();
+    setupLanguageSelector();
+    
+    // Load language preference
+    loadLanguagePreference();
     
     // Load initial data
     getTrendingMovies('day');
@@ -1719,6 +1724,224 @@ async function handleSupportFormSubmit(e) {
         
         // Show error alert to user
         alert('Hubo un error al enviar tu solicitud de soporte. Por favor, verifica que el servidor esté ejecutándose (json-server) e intenta de nuevo.');
+    }
+}
+
+/**
+ * Setup project info modal
+ */
+function setupProjectInfoModal() {
+    const projectInfoLink = document.getElementById('project-info-link');
+    const projectInfoModal = document.getElementById('project-info-modal');
+    
+    if (projectInfoLink && projectInfoModal) {
+        projectInfoLink.addEventListener('click', async (e) => {
+            e.preventDefault();
+            await openProjectInfoModal();
+        });
+        
+        // Close on overlay click
+        const overlay = projectInfoModal.querySelector('.modal-overlay');
+        if (overlay) {
+            overlay.addEventListener('click', closeProjectInfoModal);
+        }
+        
+        // Close on close button click
+        const closeBtn = projectInfoModal.querySelector('.modal-close');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', closeProjectInfoModal);
+        }
+        
+        // Close on ESC key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && projectInfoModal.style.display === 'block') {
+                closeProjectInfoModal();
+            }
+        });
+    }
+}
+
+/**
+ * Open Project Info modal and load README content
+ */
+async function openProjectInfoModal() {
+    const projectInfoModal = document.getElementById('project-info-modal');
+    const readmeContent = document.getElementById('readme-content');
+    
+    if (projectInfoModal) {
+        projectInfoModal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+        
+        // Load README content
+        if (readmeContent) {
+            try {
+                const response = await fetch('README.md');
+                const markdown = await response.text();
+                
+                // Convert markdown to HTML (simple conversion)
+                readmeContent.innerHTML = convertMarkdownToHTML(markdown);
+            } catch (error) {
+                console.error('Error loading README:', error);
+                readmeContent.innerHTML = '<p>Error al cargar la información del proyecto.</p>';
+            }
+        }
+    }
+}
+
+/**
+ * Close Project Info modal
+ */
+function closeProjectInfoModal() {
+    const projectInfoModal = document.getElementById('project-info-modal');
+    if (projectInfoModal) {
+        projectInfoModal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+}
+
+/**
+ * Simple markdown to HTML converter
+ */
+function convertMarkdownToHTML(markdown) {
+    let html = markdown;
+    
+    // Headers
+    html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+    html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+    html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+    
+    // Bold
+    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    
+    // Italic
+    html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    
+    // Links
+    html = html.replace(/\[([^\]]+)\]\(([^\)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+    
+    // Code blocks
+    html = html.replace(/```([^`]+)```/g, '<pre><code>$1</code></pre>');
+    
+    // Inline code
+    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+    
+    // Lists (unordered)
+    html = html.replace(/^\- (.+)$/gim, '<li>$1</li>');
+    html = html.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+    
+    // Line breaks
+    html = html.replace(/\n\n/g, '</p><p>');
+    html = '<p>' + html + '</p>';
+    
+    // Clean up extra tags
+    html = html.replace(/<p><h/g, '<h');
+    html = html.replace(/<\/h([1-6])><\/p>/g, '</h$1>');
+    html = html.replace(/<p><ul>/g, '<ul>');
+    html = html.replace(/<\/ul><\/p>/g, '</ul>');
+    html = html.replace(/<p><pre>/g, '<pre>');
+    html = html.replace(/<\/pre><\/p>/g, '</pre>');
+    html = html.replace(/<p><\/p>/g, '');
+    
+    return html;
+}
+
+/**
+ * Setup language selector
+ */
+function setupLanguageSelector() {
+    const langOptions = document.querySelectorAll('.lang-dropdown a');
+    const langBox = document.querySelector('.lang-box');
+    
+    langOptions.forEach(option => {
+        option.addEventListener('click', (e) => {
+            e.preventDefault();
+            const lang = e.target.dataset.lang || e.target.parentElement.dataset.lang;
+            changeLanguage(lang);
+        });
+    });
+}
+
+/**
+ * Change language
+ */
+function changeLanguage(lang) {
+    const langBox = document.querySelector('.lang-box');
+    
+    // Store language preference
+    localStorage.setItem('preferredLanguage', lang);
+    
+    // Update language box text
+    const langMap = {
+        'es': 'ES',
+        'en': 'EN',
+        'fr': 'FR',
+        'de': 'DE'
+    };
+    
+    if (langBox) {
+        langBox.textContent = langMap[lang] || 'ES';
+    }
+    
+    // In a real application, you would translate the entire UI here
+    console.log(`Language changed to: ${lang}`);
+    
+    // Show a notification
+    showLanguageNotification(lang);
+}
+
+/**
+ * Show language change notification
+ */
+function showLanguageNotification(lang) {
+    const langNames = {
+        'es': 'Español',
+        'en': 'English',
+        'fr': 'Français',
+        'de': 'Deutsch'
+    };
+    
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        background: linear-gradient(to right, #1ed5a9, #01b4e4);
+        color: white;
+        padding: 15px 25px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        z-index: 10001;
+        font-weight: 600;
+        animation: slideInRight 0.3s ease-out;
+    `;
+    notification.textContent = `Idioma cambiado a: ${langNames[lang]}`;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        notification.style.transition = 'opacity 0.3s ease-out';
+        setTimeout(() => notification.remove(), 300);
+    }, 2000);
+}
+
+/**
+ * Load saved language preference
+ */
+function loadLanguagePreference() {
+    const savedLang = localStorage.getItem('preferredLanguage');
+    if (savedLang) {
+        const langBox = document.querySelector('.lang-box');
+        const langMap = {
+            'es': 'ES',
+            'en': 'EN',
+            'fr': 'FR',
+            'de': 'DE'
+        };
+        
+        if (langBox) {
+            langBox.textContent = langMap[savedLang] || 'ES';
+        }
     }
 }
 
