@@ -61,7 +61,7 @@ body {
 .nav-left, .nav-right {
     display: flex;
     align-items: center;
-    gap: 30px;
+    gap: 15px;
 }
 
 .nav-logo {

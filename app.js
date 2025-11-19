@@ -360,7 +360,7 @@ function updateUIForAuthenticatedUser(user) {
         
         const logoutBtn = document.createElement('button');
         logoutBtn.className = 'btn-logout';
-        logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Cerrar Sesión';
+        logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> <span class="logout-text">Cerrar Sesión</span>';
         logoutBtn.addEventListener('click', handleLogout);
         
         userProfile.appendChild(userInfo);
