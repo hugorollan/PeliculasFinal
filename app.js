@@ -339,6 +339,14 @@ function updateUIForAuthenticatedUser(user) {
         const userProfile = document.createElement('div');
         userProfile.className = 'user-profile';
         
+        // Create clickable user info container
+        const userInfo = document.createElement('div');
+        userInfo.className = 'user-info';
+        userInfo.title = 'Ver mi perfil';
+        userInfo.addEventListener('click', () => {
+            window.location.href = 'profile.html';
+        });
+        
         const userAvatar = document.createElement('div');
         userAvatar.className = 'user-avatar';
         userAvatar.textContent = user.name.charAt(0).toUpperCase();
@@ -347,13 +355,15 @@ function updateUIForAuthenticatedUser(user) {
         userName.className = 'user-name';
         userName.textContent = user.name;
         
+        userInfo.appendChild(userAvatar);
+        userInfo.appendChild(userName);
+        
         const logoutBtn = document.createElement('button');
         logoutBtn.className = 'btn-logout';
         logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Cerrar Sesión';
         logoutBtn.addEventListener('click', handleLogout);
         
-        userProfile.appendChild(userAvatar);
-        userProfile.appendChild(userName);
+        userProfile.appendChild(userInfo);
         userProfile.appendChild(logoutBtn);
         
         navRight.appendChild(userProfile);

@@ -182,9 +182,11 @@
 .user-profile {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     color: var(--tmdb-white);
     font-size: 0.9rem;
+    flex-wrap: nowrap;
+    white-space: nowrap;
 }
 
 .user-avatar {
@@ -197,10 +199,33 @@
     justify-content: center;
     font-weight: 600;
     font-size: 0.85rem;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: transform var(--transition-speed);
+}
+
+.user-avatar:hover {
+    transform: scale(1.1);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: opacity var(--transition-speed);
+}
+
+.user-info:hover {
+    opacity: 0.8;
 }
 
 .user-name {
     font-weight: 600;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .btn-logout {
@@ -213,11 +238,35 @@
     font-weight: 600;
     cursor: pointer;
     transition: all var(--transition-speed);
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .btn-logout:hover {
     background: var(--tmdb-white);
     color: var(--tmdb-dark-blue);
+}
+
+/* Responsive adjustments for user profile */
+@media (max-width: 1024px) {
+    .user-name {
+        max-width: 100px;
+    }
+}
+
+@media (max-width: 768px) {
+    .user-profile {
+        gap: 8px;
+    }
+    
+    .user-name {
+        display: none;
+    }
+    
+    .btn-logout {
+        padding: 5px 10px;
+        font-size: 0.8rem;
+    }
 }
 
 /* Responsive */
