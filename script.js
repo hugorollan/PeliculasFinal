@@ -29,12 +29,12 @@ const TRANSLATIONS = {
         movies_popular: 'Popular',
         movies_now_playing: 'En cartelera',
         movies_upcoming: 'Próximamente',
-        movies_top_rated: 'Mejor puntuadas',
+        movies_top_rated: 'Mejor valoradas',
         // TV Shows dropdown
         tv_popular: 'Popular',
         tv_airing_today: 'En emisión hoy',
         tv_on_the_air: 'En televisión',
-        tv_top_rated: 'Mejor puntuadas',
+        tv_top_rated: 'Mejor valoradas',
         // People dropdown
         people_popular: 'Popular',
         // More dropdown
