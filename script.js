@@ -804,6 +804,11 @@ function setupNavigationDropdowns() {
     const dropdownLinks = document.querySelectorAll('.dropdown-content a');
     
     dropdownLinks.forEach(link => {
+        // Skip project info link as it has its own handler
+        if (link.id === 'project-info-link') {
+            return;
+        }
+        
         link.addEventListener('click', (e) => {
             e.preventDefault();
             
