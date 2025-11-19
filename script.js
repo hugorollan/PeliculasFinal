@@ -31,6 +31,8 @@ const options = {
 let currentTrendingTime = 'day';
 let currentPopularCategory = 'streaming';
 let currentTrailerCategory = 'streaming';
+let currentContentType = 'movie'; // Track whether we're showing movies or TV
+let currentCategory = null; // Track current category being displayed
 
 // ============ UTILITY FUNCTIONS ============
 
@@ -84,24 +86,27 @@ function getRatingColor(percent) {
 }
 
 /**
- * Create movie card element
+ * Create movie/TV card element
  */
-function createMovieCard(movie) {
-    const { title, poster_path, vote_average, release_date, id } = movie;
+function createMovieCard(item, type = 'movie') {
+    const title = type === 'movie' ? item.title : item.name;
+    const releaseDate = type === 'movie' ? item.release_date : item.first_air_date;
+    const { poster_path, vote_average, id } = item;
     
-    if (!poster_path) return null; // Skip movies without posters
+    if (!poster_path) return null; // Skip items without posters
     
     const percent = Math.round(vote_average * 10);
     const borderColor = getRatingColor(percent);
-    const dateStr = formatDate(release_date);
+    const dateStr = formatDate(releaseDate);
     
-    // Check if movie is in favorites
+    // Check if item is in favorites
     const currentUser = getCurrentUser();
     const isFavorite = currentUser && currentUser.favorites && currentUser.favorites.includes(id);
 
     const card = document.createElement('div');
     card.classList.add('card');
     card.setAttribute('data-movie-id', id);
+    card.setAttribute('data-content-type', type);
     card.style.cursor = 'pointer';
     
     card.innerHTML = `
@@ -130,8 +135,15 @@ function createMovieCard(movie) {
         toggleFavorite(id);
     });
 
-    // Add click event to open movie details
-    card.addEventListener('click', () => openMovieDetails(id));
+    // Add click event to open details
+    card.addEventListener('click', () => {
+        if (type === 'movie') {
+            openMovieDetails(id);
+        } else {
+            // For TV shows, we can still use the same modal or create a separate one
+            openMovieDetails(id); // Keep same for now
+        }
+    });
 
     return card;
 }
@@ -169,6 +181,54 @@ function createTrailerCard(movie) {
 }
 
 // ============ API FUNCTIONS ============
+
+/**
+ * Fetch content by type (movie/tv) and category
+ */
+async function getContentByCategory(type = 'movie', category = 'popular', container = trendingContainer) {
+    const url = `${BASE_URL}/${type}/${category}?language=es-ES&page=1`;
+    
+    try {
+        showLoading();
+        const res = await fetch(url, options);
+        
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        
+        const data = await res.json();
+        displayContent(data.results, container, type);
+        hideLoading();
+        
+        // Update section title based on content type and category
+        updateSectionTitle(type, category);
+    } catch (error) {
+        console.error(`Error fetching ${type} ${category}:`, error);
+        showError();
+    }
+}
+
+/**
+ * Update section title based on content type and category
+ */
+function updateSectionTitle(type, category) {
+    const trendingTitle = document.getElementById('trending-title');
+    if (!trendingTitle) return;
+    
+    const contentTypeLabel = type === 'movie' ? 'Películas' : 'Series';
+    
+    const categoryLabels = {
+        popular: 'Populares',
+        now_playing: 'En cartelera',
+        upcoming: 'Próximamente',
+        top_rated: 'Mejor puntuadas',
+        airing_today: 'En emisión hoy',
+        on_the_air: 'En televisión'
+    };
+    
+    const categoryLabel = categoryLabels[category] || 'Tendencias';
+    trendingTitle.textContent = `${contentTypeLabel} ${categoryLabel}`;
+}
 
 /**
  * Fetch trending movies
@@ -314,23 +374,30 @@ async function searchMoviesByKeyword(keywordId, keywordName) {
 // ============ DISPLAY FUNCTIONS ============
 
 /**
- * Display movies in container
+ * Display content (movies or TV shows) in container
  */
-function displayMovies(movies, container) {
+function displayContent(items, container, type = 'movie') {
     if (!container) return;
     
     container.innerHTML = '';
     
     const fragment = document.createDocumentFragment();
     
-    movies.forEach(movie => {
-        const card = createMovieCard(movie);
+    items.forEach(item => {
+        const card = createMovieCard(item, type);
         if (card) {
             fragment.appendChild(card);
         }
     });
     
     container.appendChild(fragment);
+}
+
+/**
+ * Display movies in container (legacy support)
+ */
+function displayMovies(movies, container) {
+    displayContent(movies, container, 'movie');
 }
 
 /**
@@ -455,6 +522,55 @@ function setupAccessibility() {
             }
         });
     }
+}
+
+/**
+ * Setup navigation dropdown handlers
+ */
+function setupNavigationDropdowns() {
+    const dropdownLinks = document.querySelectorAll('.dropdown-content a');
+    
+    dropdownLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            const type = link.getAttribute('data-type');
+            const category = link.getAttribute('data-category');
+            
+            if (type && category) {
+                // Update state
+                currentContentType = type;
+                currentCategory = category;
+                
+                // Fetch and display content
+                getContentByCategory(type, category, trendingContainer);
+                
+                // Show trending section and hide others
+                showTrendingSection();
+                
+                // Scroll to trending section
+                document.querySelector('.trending-section').scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+            }
+        });
+    });
+}
+
+/**
+ * Show trending section and hide others
+ */
+function showTrendingSection() {
+    const favoritesSection = document.getElementById('favorites-section');
+    const trendingSection = document.querySelector('.trending-section');
+    const popularSection = document.querySelector('.popular-section');
+    const trailersSection = document.querySelector('.latest-trailers-section');
+    
+    if (favoritesSection) favoritesSection.style.display = 'none';
+    if (trendingSection) trendingSection.style.display = 'block';
+    if (popularSection) popularSection.style.display = 'block';
+    if (trailersSection) trailersSection.style.display = 'block';
 }
 
 // ============ MOVIE DETAIL FUNCTIONS ============
@@ -1015,6 +1131,7 @@ function init() {
     setupToggleSelectors();
     setupSearchForm();
     setupAccessibility();
+    setupNavigationDropdowns();
     setupModalHandlers();
     setupFavoritesToggle();
     

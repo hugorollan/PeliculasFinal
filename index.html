@@ -16,8 +16,24 @@
             <div class="nav-left">
                 <a href="index.html" class="nav-logo" aria-label="TMDB Inicio">TMDB</a>
                 <ul class="nav-links">
-                    <li><a href="#" class="nav-link">Películas</a></li>
-                    <li><a href="#" class="nav-link">Series</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="nav-link">Películas</a>
+                        <div class="dropdown-content">
+                            <a href="#" data-type="movie" data-category="popular">Popular</a>
+                            <a href="#" data-type="movie" data-category="now_playing">En cartelera</a>
+                            <a href="#" data-type="movie" data-category="upcoming">Próximamente</a>
+                            <a href="#" data-type="movie" data-category="top_rated">Mejor puntuadas</a>
+                        </div>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="nav-link">Series</a>
+                        <div class="dropdown-content">
+                            <a href="#" data-type="tv" data-category="popular">Popular</a>
+                            <a href="#" data-type="tv" data-category="airing_today">En emisión hoy</a>
+                            <a href="#" data-type="tv" data-category="on_the_air">En televisión</a>
+                            <a href="#" data-type="tv" data-category="top_rated">Mejor puntuadas</a>
+                        </div>
+                    </li>
                     <li><a href="#" class="nav-link">Gente</a></li>
                     <li><a href="#" class="nav-link">Más</a></li>
                 </ul>
