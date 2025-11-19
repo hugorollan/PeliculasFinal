@@ -30,7 +30,43 @@ const TRANSLATIONS = {
         cat_tv: 'En TV',
         cat_rent: 'En Alquiler',
         cat_theaters: 'En Cines',
-        empty_favorites: 'No tienes películas favoritas aún.'
+        empty_favorites: 'No tienes películas favoritas aún.',
+        // Movies dropdown
+        movies_popular: 'Popular',
+        movies_now_playing: 'En cartelera',
+        movies_upcoming: 'Próximamente',
+        movies_top_rated: 'Mejor puntuadas',
+        // TV Shows dropdown
+        tv_popular: 'Popular',
+        tv_airing_today: 'En emisión hoy',
+        tv_on_the_air: 'En televisión',
+        tv_top_rated: 'Mejor puntuadas',
+        // People dropdown
+        people_popular: 'Popular',
+        // More dropdown
+        more_debates: 'Debates',
+        more_leaderboard: 'Tabla de clasificación',
+        more_support: 'Soporte',
+        // Auth forms
+        auth_login_title: 'Iniciar Sesión',
+        auth_login_subtitle: 'Accede a tu cuenta para disfrutar de todas las funcionalidades',
+        auth_email_label: 'Correo Electrónico',
+        auth_password_label: 'Contraseña',
+        auth_login_button: 'Iniciar Sesión',
+        auth_no_account: '¿No tienes cuenta?',
+        auth_register_link: 'Regístrate aquí',
+        auth_register_title: 'Crear Cuenta',
+        auth_register_subtitle: 'Únete a nuestra comunidad de amantes del cine',
+        auth_name_label: 'Nombre Completo',
+        auth_confirm_password_label: 'Confirmar Contraseña',
+        auth_register_button: 'Crear Cuenta',
+        auth_have_account: '¿Ya tienes cuenta?',
+        auth_login_link: 'Inicia sesión aquí',
+        auth_email_placeholder: 'tu@email.com',
+        auth_password_placeholder: 'Tu contraseña',
+        auth_name_placeholder: 'Tu nombre completo',
+        auth_password_min_placeholder: 'Mínimo 6 caracteres',
+        auth_confirm_password_placeholder: 'Repite tu contraseña'
     },
     'en': {
         nav_movies: 'Movies',
@@ -53,7 +89,43 @@ const TRANSLATIONS = {
         cat_tv: 'On TV',
         cat_rent: 'For Rent',
         cat_theaters: 'In Theaters',
-        empty_favorites: 'You haven\'t added any favorites yet.'
+        empty_favorites: 'You haven\'t added any favorites yet.',
+        // Movies dropdown
+        movies_popular: 'Popular',
+        movies_now_playing: 'Now Playing',
+        movies_upcoming: 'Upcoming',
+        movies_top_rated: 'Top Rated',
+        // TV Shows dropdown
+        tv_popular: 'Popular',
+        tv_airing_today: 'Airing Today',
+        tv_on_the_air: 'On The Air',
+        tv_top_rated: 'Top Rated',
+        // People dropdown
+        people_popular: 'Popular',
+        // More dropdown
+        more_debates: 'Discussions',
+        more_leaderboard: 'Leaderboard',
+        more_support: 'Support',
+        // Auth forms
+        auth_login_title: 'Sign In',
+        auth_login_subtitle: 'Access your account to enjoy all features',
+        auth_email_label: 'Email Address',
+        auth_password_label: 'Password',
+        auth_login_button: 'Sign In',
+        auth_no_account: 'Don\'t have an account?',
+        auth_register_link: 'Sign up here',
+        auth_register_title: 'Create Account',
+        auth_register_subtitle: 'Join our community of movie lovers',
+        auth_name_label: 'Full Name',
+        auth_confirm_password_label: 'Confirm Password',
+        auth_register_button: 'Create Account',
+        auth_have_account: 'Already have an account?',
+        auth_login_link: 'Sign in here',
+        auth_email_placeholder: 'your@email.com',
+        auth_password_placeholder: 'Your password',
+        auth_name_placeholder: 'Your full name',
+        auth_password_min_placeholder: 'Minimum 6 characters',
+        auth_confirm_password_placeholder: 'Repeat your password'
     }
 };
 
