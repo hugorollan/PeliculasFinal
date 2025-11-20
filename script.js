@@ -1745,6 +1745,160 @@ function closeMovieDetails() {
 }
 
 /**
+ * Show person details
+ */
+async function showPersonDetails(personId) {
+    if (!movieModal || !movieDetailContainer) return;
+    
+    // Show modal with loading state
+    movieModal.style.display = 'block';
+    movieDetailContainer.innerHTML = '<div class="loading-spinner"><div class="spinner"></div><p>Cargando información...</p></div>';
+    document.body.style.overflow = 'hidden';
+    
+    try {
+        // Fetch person details and credits
+        const [personDetails, personCredits] = await Promise.all([
+            fetchPersonDetails(personId),
+            fetchPersonCredits(personId)
+        ]);
+        
+        // Display the person details
+        displayPersonDetails(personDetails, personCredits);
+    } catch (error) {
+        console.error('Error loading person details:', error);
+        movieDetailContainer.innerHTML = '<div class="error-message"><i class="fas fa-exclamation-triangle"></i><p>Error al cargar la información de la persona.</p></div>';
+    }
+}
+
+/**
+ * Fetch person details
+ */
+async function fetchPersonDetails(personId) {
+    const url = `${BASE_URL}/person/${personId}?language=${currentApiLang}`;
+    const res = await fetch(url, options);
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    return await res.json();
+}
+
+/**
+ * Fetch person credits (movies and TV shows)
+ */
+async function fetchPersonCredits(personId) {
+    const url = `${BASE_URL}/person/${personId}/combined_credits?language=${currentApiLang}`;
+    const res = await fetch(url, options);
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    return await res.json();
+}
+
+/**
+ * Display person details
+ */
+function displayPersonDetails(person, credits) {
+    const knownFor = person.known_for_department || 'Interpretación';
+    const birthday = person.birthday ? new Date(person.birthday).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' }) : 'No disponible';
+    const birthplace = person.place_of_birth || 'No disponible';
+    const gender = person.gender === 1 ? 'Femenino' : person.gender === 2 ? 'Masculino' : 'No especificado';
+    const age = person.birthday ? calculateAge(person.birthday) : '';
+    
+    // Sort credits by popularity and filter
+    const sortedCredits = credits.cast
+        .filter(item => item.poster_path)
+        .sort((a, b) => (b.vote_count || 0) - (a.vote_count || 0))
+        .slice(0, 12);
+    
+    movieDetailContainer.innerHTML = `
+        <div class="movie-detail person-detail">
+            <!-- Person Header -->
+            <div class="movie-header person-header" style="background: linear-gradient(to bottom, rgba(3, 37, 65, 0.9), rgba(3, 37, 65, 0.95));">
+                <div class="movie-header-content">
+                    <div class="movie-poster person-poster">
+                        ${person.profile_path 
+                            ? `<img src="${IMAGE_URL}${person.profile_path}" alt="${person.name}">`
+                            : `<div class="no-poster"><i class="fas fa-user"></i></div>`
+                        }
+                    </div>
+                    <div class="movie-info person-info">
+                        <h1>${person.name}</h1>
+                        
+                        <div class="person-meta">
+                            <div class="person-meta-item">
+                                <i class="fas fa-briefcase"></i>
+                                <span><strong>Conocido por:</strong> ${knownFor}</span>
+                            </div>
+                            ${person.birthday ? `
+                                <div class="person-meta-item">
+                                    <i class="fas fa-birthday-cake"></i>
+                                    <span><strong>Fecha de nacimiento:</strong> ${birthday}${age ? ` (${age} años)` : ''}</span>
+                                </div>
+                            ` : ''}
+                            ${person.place_of_birth ? `
+                                <div class="person-meta-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span><strong>Lugar de nacimiento:</strong> ${birthplace}</span>
+                                </div>
+                            ` : ''}
+                            <div class="person-meta-item">
+                                <i class="fas fa-venus-mars"></i>
+                                <span><strong>Sexo:</strong> ${gender}</span>
+                            </div>
+                            ${credits.cast ? `
+                                <div class="person-meta-item">
+                                    <i class="fas fa-film"></i>
+                                    <span><strong>Créditos conocidos:</strong> ${credits.cast.length}</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                        
+                        ${person.biography ? `
+                            <div class="person-biography">
+                                <h3>Biografía</h3>
+                                <p>${person.biography}</p>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Known For Section -->
+            ${sortedCredits.length > 0 ? `
+                <div class="detail-section">
+                    <h2>Conocido por</h2>
+                    <div class="recommendations-grid">
+                        ${sortedCredits.map(item => `
+                            <div class="recommendation-card" data-id="${item.id}" data-type="${item.media_type}" onclick="openMovieDetails(${item.id}, '${item.media_type}')">
+                                <div class="recommendation-poster">
+                                    <img src="${IMAGE_URL}${item.poster_path}" alt="${item.title || item.name}">
+                                </div>
+                                <div class="recommendation-info">
+                                    <div class="recommendation-title">${item.title || item.name}</div>
+                                    ${item.character ? `<div class="recommendation-character">${item.character}</div>` : ''}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : ''}
+        </div>
+    `;
+}
+
+/**
+ * Calculate age from birthday
+ */
+function calculateAge(birthday) {
+    const birthDate = new Date(birthday);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+    
+    return age;
+}
+
+/**
  * Fetch movie details
  */
 async function fetchMovieDetails(movieId, type = 'movie') {
@@ -1966,7 +2120,7 @@ function displayMovieDetails(data) {
                 ${credits.cast.length > 0 ? `
                     <div class="cast-scroller">
                         ${credits.cast.slice(0, 10).map(person => `
-                            <div class="cast-card">
+                            <div class="cast-card" data-person-id="${person.id}" style="cursor: pointer;" onclick="showPersonDetails(${person.id})">
                                 ${person.profile_path ? `
                                     <div class="cast-image">
                                         <img src="${IMAGE_URL + person.profile_path}" alt="${person.name}">

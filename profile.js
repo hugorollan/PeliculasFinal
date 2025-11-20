@@ -71,6 +71,17 @@ function hideNavbarElements(user) {
         <span>${user.name}</span>
     `;
     navRight.appendChild(usernameDisplay);
+    
+    // Add logout button
+    const logoutBtn = document.createElement('a');
+    logoutBtn.className = 'nav-link btn-join';
+    logoutBtn.href = '#';
+    logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> <span data-i18n="auth_logout_button">Cerrar sesión</span>';
+    logoutBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        handleProfileLogout();
+    });
+    navRight.appendChild(logoutBtn);
 }
 
 /**
@@ -686,6 +697,19 @@ async function removeFavoriteFromProfile(itemId, type, cardElement) {
         console.error('Error removing favorite:', error);
         showToast('Error al eliminar de favoritos', 'error');
     }
+}
+
+// ============ LOGOUT FUNCTION ============
+
+/**
+ * Handle logout from profile page
+ */
+function handleProfileLogout() {
+    // Clear user session
+    localStorage.removeItem('currentUser');
+    
+    // Redirect to index.html
+    window.location.href = 'index.html';
 }
 
 // ============ INITIALIZATION ============

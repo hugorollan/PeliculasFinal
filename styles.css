@@ -2070,4 +2070,83 @@ main {
     }
 }
 
+/* ============ PERSON DETAILS ============ */
+
+.person-detail .person-header {
+    padding: 2rem;
+}
+
+.person-detail .person-poster {
+    width: 300px;
+    height: 450px;
+}
+
+.person-detail .person-info {
+    flex: 1;
+    color: var(--tmdb-white);
+}
+
+.person-detail .person-info h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.person-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.person-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+}
+
+.person-meta-item i {
+    width: 20px;
+    text-align: center;
+    color: var(--tmdb-cyan);
+}
+
+.person-biography {
+    margin-top: 1.5rem;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.person-biography h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.person-biography p {
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.recommendation-character {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+}
+
+@media (max-width: 768px) {
+    .person-detail .person-header {
+        flex-direction: column;
+    }
+    
+    .person-detail .person-poster {
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto 1.5rem;
+    }
+    
+    .person-detail .person-info h1 {
+        font-size: 2rem;
+    }
+}
+
 
