@@ -1084,17 +1084,25 @@ async function getTrendingMovies(timeWindow = 'day', page = 1, append = false) {
     }
 }
 
+// Default category constant for popular and trailer sections
+const DEFAULT_CATEGORY = 'streaming';
+
+// Minimum vote count for trailer content quality
+const MIN_VOTE_COUNT_FOR_TRAILERS = 10;
+
 /**
- * Get watch provider IDs for a category (Spain region - ES)
- * These are TMDB watch provider IDs
+ * Get watch monetization type for a category (Spain region - ES)
+ * Maps UI categories to TMDB API monetization types
+ * Note: 'theaters' is handled separately using the now_playing endpoint,
+ * so 'buy' is only a fallback and not typically used.
  */
 function getWatchProviderIds(category) {
     // Watch monetization types for discover endpoint
     const monetizationTypes = {
-        'streaming': 'flatrate',
-        'tv': 'free',
-        'rent': 'rent',
-        'theaters': 'buy'
+        'streaming': 'flatrate',  // Subscription streaming (Netflix, Disney+, etc.)
+        'tv': 'free',             // Free to watch (broadcast TV, free streaming)
+        'rent': 'rent',           // Available for rental
+        'theaters': 'buy'         // Fallback only - theaters uses now_playing endpoint
     };
     return monetizationTypes[category] || 'flatrate';
 }
@@ -1104,7 +1112,7 @@ function getWatchProviderIds(category) {
  */
 async function getPopularMovies(page = 1, append = false, category = null) {
     // Use the current category if not provided
-    const activeCategory = category || currentPopularCategory || 'streaming';
+    const activeCategory = category || currentPopularCategory || DEFAULT_CATEGORY;
     
     let url;
     
@@ -1153,7 +1161,7 @@ async function getPopularMovies(page = 1, append = false, category = null) {
  */
 async function getUpcomingMovies(category = null) {
     // Use the current category if not provided
-    const activeCategory = category || currentTrailerCategory || 'streaming';
+    const activeCategory = category || currentTrailerCategory || DEFAULT_CATEGORY;
     
     let url;
     
@@ -1165,7 +1173,8 @@ async function getUpcomingMovies(category = null) {
         const monetizationType = getWatchProviderIds(activeCategory);
         // Get popular movies that have the specified monetization type and have been released recently
         // Use discover endpoint with sorting by release date to get newer content with trailers
-        url = `${BASE_URL}/discover/movie?language=${currentApiLang}&page=1&sort_by=release_date.desc&watch_region=ES&with_watch_monetization_types=${monetizationType}&vote_count.gte=10`;
+        // MIN_VOTE_COUNT_FOR_TRAILERS ensures we get quality content with actual trailers
+        url = `${BASE_URL}/discover/movie?language=${currentApiLang}&page=1&sort_by=release_date.desc&watch_region=ES&with_watch_monetization_types=${monetizationType}&vote_count.gte=${MIN_VOTE_COUNT_FOR_TRAILERS}`;
     }
     
     try {
@@ -2729,8 +2738,8 @@ function init() {
     
     // Load initial data with default categories
     getTrendingMovies('day');
-    getPopularMovies(1, false, 'streaming');
-    getUpcomingMovies('streaming');
+    getPopularMovies(1, false, DEFAULT_CATEGORY);
+    getUpcomingMovies(DEFAULT_CATEGORY);
     
     // Handle deep linking - check if URL has a movie hash
     handleDeepLinking();
