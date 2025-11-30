@@ -1084,11 +1084,47 @@ async function getTrendingMovies(timeWindow = 'day', page = 1, append = false) {
     }
 }
 
+// Default category constant for popular and trailer sections
+const DEFAULT_CATEGORY = 'streaming';
+
+// Minimum vote count for trailer content quality
+const MIN_VOTE_COUNT_FOR_TRAILERS = 10;
+
 /**
- * Fetch popular movies
+ * Get watch monetization type for a category (Spain region - ES)
+ * Maps UI categories to TMDB API monetization types
+ * Note: 'theaters' is handled separately using the now_playing endpoint,
+ * so 'buy' is only a fallback and not typically used.
  */
-async function getPopularMovies(page = 1, append = false) {
-    const url = `${BASE_URL}/movie/popular?language=${currentApiLang}&page=${page}`;
+function getWatchProviderIds(category) {
+    // Watch monetization types for discover endpoint
+    const monetizationTypes = {
+        'streaming': 'flatrate',  // Subscription streaming (Netflix, Disney+, etc.)
+        'tv': 'free',             // Free to watch (broadcast TV, free streaming)
+        'rent': 'rent',           // Available for rental
+        'theaters': 'buy'         // Fallback only - theaters uses now_playing endpoint
+    };
+    return monetizationTypes[category] || 'flatrate';
+}
+
+/**
+ * Fetch popular movies by category (streaming, tv, rent, theaters)
+ */
+async function getPopularMovies(page = 1, append = false, category = null) {
+    // Use the current category if not provided
+    const activeCategory = category || currentPopularCategory || DEFAULT_CATEGORY;
+    
+    let url;
+    
+    if (activeCategory === 'theaters') {
+        // For "En Cines" (In Theaters), use now_playing endpoint
+        url = `${BASE_URL}/movie/now_playing?language=${currentApiLang}&page=${page}&region=ES`;
+    } else {
+        // For other categories, use discover endpoint with watch monetization types
+        const monetizationType = getWatchProviderIds(activeCategory);
+        // Use discover endpoint with watch_region and with_watch_monetization_types
+        url = `${BASE_URL}/discover/movie?language=${currentApiLang}&page=${page}&sort_by=popularity.desc&watch_region=ES&with_watch_monetization_types=${monetizationType}`;
+    }
     
     try {
         if (!append) {
@@ -1121,10 +1157,25 @@ async function getPopularMovies(page = 1, append = false) {
 }
 
 /**
- * Fetch movies for trailers section
+ * Fetch movies for trailers section by category
  */
-async function getUpcomingMovies() {
-    const url = `${BASE_URL}/movie/upcoming?language=${currentApiLang}&page=1`;
+async function getUpcomingMovies(category = null) {
+    // Use the current category if not provided
+    const activeCategory = category || currentTrailerCategory || DEFAULT_CATEGORY;
+    
+    let url;
+    
+    if (activeCategory === 'theaters') {
+        // For "En Cines" (In Theaters), use now_playing to get recent theater releases
+        url = `${BASE_URL}/movie/now_playing?language=${currentApiLang}&page=1&region=ES`;
+    } else {
+        // For other categories, use discover endpoint with watch monetization types
+        const monetizationType = getWatchProviderIds(activeCategory);
+        // Get popular movies that have the specified monetization type and have been released recently
+        // Use discover endpoint with sorting by release date to get newer content with trailers
+        // MIN_VOTE_COUNT_FOR_TRAILERS ensures we get quality content with actual trailers
+        url = `${BASE_URL}/discover/movie?language=${currentApiLang}&page=1&sort_by=release_date.desc&watch_region=ES&with_watch_monetization_types=${monetizationType}&vote_count.gte=${MIN_VOTE_COUNT_FOR_TRAILERS}`;
+    }
     
     try {
         const res = await fetch(url, options);
@@ -1136,7 +1187,7 @@ async function getUpcomingMovies() {
         const data = await res.json();
         displayTrailers(data.results);
     } catch (error) {
-        console.error('Error fetching upcoming movies:', error);
+        console.error('Error fetching movies for trailers:', error);
     }
 }
 
@@ -1406,9 +1457,8 @@ function setupToggleSelectors() {
             const category = this.getAttribute('data-category');
             currentPopularCategory = category;
             
-            // For now, all categories show popular movies
-            // In a full implementation, you'd fetch different data per category
-            getPopularMovies();
+            // Fetch movies filtered by category (streaming, tv, rent, theaters)
+            getPopularMovies(1, false, category);
         });
     });
 
@@ -1427,8 +1477,8 @@ function setupToggleSelectors() {
             const category = this.getAttribute('data-trailer');
             currentTrailerCategory = category;
             
-            // For now, all categories show upcoming movies
-            getUpcomingMovies();
+            // Fetch trailers filtered by category (streaming, tv, rent, theaters)
+            getUpcomingMovies(category);
         });
     });
 }
@@ -2656,7 +2706,7 @@ function setupLoadMoreButtons() {
             loadMorePopular.disabled = true;
             loadMorePopular.innerHTML = `<i class="fas fa-spinner fa-spin"></i> <span>${getTranslation('loading')}</span>`;
             
-            await getPopularMovies(popularCurrentPage + 1, true);
+            await getPopularMovies(popularCurrentPage + 1, true, currentPopularCategory);
             
             loadMorePopular.innerHTML = `<i class="fas fa-plus-circle"></i> <span data-i18n="load_more">${getTranslation('load_more')}</span>`;
         });
@@ -2686,10 +2736,10 @@ function init() {
     // Load language preference
     loadLanguagePreference();
     
-    // Load initial data
+    // Load initial data with default categories
     getTrendingMovies('day');
-    getPopularMovies();
-    getUpcomingMovies();
+    getPopularMovies(1, false, DEFAULT_CATEGORY);
+    getUpcomingMovies(DEFAULT_CATEGORY);
     
     // Handle deep linking - check if URL has a movie hash
     handleDeepLinking();
@@ -3150,8 +3200,8 @@ function changeLanguage(lang, showNotification = false) {
     // 5. Recargar contenido de la API con el nuevo idioma
     console.log(`Reloading content in: ${currentApiLang}`);
     getTrendingMovies(currentTrendingTime);
-    getPopularMovies();
-    getUpcomingMovies();
+    getPopularMovies(1, false, currentPopularCategory);
+    getUpcomingMovies(currentTrailerCategory);
     
     // Notificación (solo si se solicita)
     if (showNotification) {
