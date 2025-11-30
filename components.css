@@ -1292,49 +1292,47 @@
 }
 
 /* ========================================
-   LOAD MORE BUTTON
+   LOAD MORE BUTTON (INLINE VERSION)
+   Used inside .section-header which uses flexbox.
+   The margin-left: auto pushes the button to the right side.
    ======================================== */
 
-.load-more-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 30px;
-    margin-bottom: 30px;
-}
-
-.btn-load-more {
+.btn-load-more-inline {
     background: linear-gradient(to right, var(--tmdb-light-green), var(--tmdb-light-blue));
     color: white;
     border: none;
-    padding: 14px 32px;
-    border-radius: 25px;
-    font-size: 1rem;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 6px;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(1, 180, 228, 0.3);
+    box-shadow: 0 2px 6px rgba(1, 180, 228, 0.25);
+    /* Pushes button to the right in flexbox parent (.section-header) */
+    margin-left: auto;
+    white-space: nowrap;
 }
 
-.btn-load-more:hover {
+.btn-load-more-inline:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(1, 180, 228, 0.4);
+    box-shadow: 0 4px 10px rgba(1, 180, 228, 0.35);
 }
 
-.btn-load-more:active {
+.btn-load-more-inline:active {
     transform: translateY(0);
 }
 
-.btn-load-more:disabled {
+.btn-load-more-inline:disabled {
     opacity: 0.6;
     cursor: not-allowed;
     transform: none;
 }
 
-.btn-load-more i {
-    font-size: 1.1rem;
+.btn-load-more-inline i {
+    font-size: 0.9rem;
 }
 
 /* ========================================

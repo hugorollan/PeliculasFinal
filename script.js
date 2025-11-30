@@ -25,6 +25,8 @@ const TRANSLATIONS = {
         cat_rent: 'En Alquiler',
         cat_theaters: 'En Cines',
         empty_favorites: 'No tienes películas favoritas aún.',
+        load_more: 'Cargar más',
+        loading: 'Cargando...',
         // Movies dropdown
         movies_popular: 'Popular',
         movies_now_playing: 'En cartelera',
@@ -213,6 +215,8 @@ const TRANSLATIONS = {
         cat_rent: 'For Rent',
         cat_theaters: 'In Theaters',
         empty_favorites: 'You haven\'t added any favorites yet.',
+        load_more: 'Load more',
+        loading: 'Loading...',
         // Movies dropdown
         movies_popular: 'Popular',
         movies_now_playing: 'Now Playing',
@@ -401,6 +405,8 @@ const TRANSLATIONS = {
         cat_rent: 'À louer',
         cat_theaters: 'Au cinéma',
         empty_favorites: "Vous n'avez pas encore ajouté de favoris.",
+        load_more: 'Charger plus',
+        loading: 'Chargement...',
         // Movies dropdown
         movies_popular: 'Populaire',
         movies_now_playing: 'À l\'affiche',
@@ -589,6 +595,8 @@ const TRANSLATIONS = {
         cat_rent: 'Zum Ausleihen',
         cat_theaters: 'Im Kino',
         empty_favorites: 'Sie haben noch keine Favoriten hinzugefügt.',
+        load_more: 'Mehr laden',
+        loading: 'Laden...',
         // Movies dropdown
         movies_popular: 'Beliebt',
         movies_now_playing: 'Aktuell im Kino',
@@ -2635,22 +2643,22 @@ function setupLoadMoreButtons() {
     if (loadMoreTrending) {
         loadMoreTrending.addEventListener('click', async () => {
             loadMoreTrending.disabled = true;
-            loadMoreTrending.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cargando...';
+            loadMoreTrending.innerHTML = `<i class="fas fa-spinner fa-spin"></i> <span>${getTranslation('loading')}</span>`;
             
             await getTrendingMovies(currentTrendingTime, trendingCurrentPage + 1, true);
             
-            loadMoreTrending.innerHTML = '<i class="fas fa-plus-circle"></i> Cargar más';
+            loadMoreTrending.innerHTML = `<i class="fas fa-plus-circle"></i> <span data-i18n="load_more">${getTranslation('load_more')}</span>`;
         });
     }
     
     if (loadMorePopular) {
         loadMorePopular.addEventListener('click', async () => {
             loadMorePopular.disabled = true;
-            loadMorePopular.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cargando...';
+            loadMorePopular.innerHTML = `<i class="fas fa-spinner fa-spin"></i> <span>${getTranslation('loading')}</span>`;
             
             await getPopularMovies(popularCurrentPage + 1, true);
             
-            loadMorePopular.innerHTML = '<i class="fas fa-plus-circle"></i> Cargar más';
+            loadMorePopular.innerHTML = `<i class="fas fa-plus-circle"></i> <span data-i18n="load_more">${getTranslation('load_more')}</span>`;
         });
     }
 }
