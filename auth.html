@@ -303,6 +303,8 @@
         </div>
     </div>
 
+    <!-- Load env.js with fallback if not found -->
+    <script src="env.js" onerror="console.warn('⚠️ env.js not found. Please copy env.js.example to env.js and add your TMDB API key.')"></script>
     <script src="config.js"></script>
     <script src="app.js"></script>
     <script src="script.js"></script>

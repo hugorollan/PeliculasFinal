@@ -3,7 +3,12 @@
 // ============================================
 
 // API Configuration
-const API_KEY = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzOTgxNWVjZTI4ZjcyNWJlZGRmY2Y3OGE0YzRjZGU0ZiIsIm5iZiI6MTc2MDQ1NjUxNS4xNDcsInN1YiI6IjY4ZWU2ZjQzNDYzMzQ0Yjg0MTlkZjQ3MCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.ejdXz4pm0dZn0OAVJvJ16R8SwNAa-MBkO_yttUiblLk';
+// The API key is loaded from env.js - see env.js.example for setup instructions
+// If ENV is not defined, show a warning in the console
+if (typeof ENV === 'undefined') {
+    console.warn('⚠️ ENV not defined. Please create env.js from env.js.example with your TMDB API key.');
+}
+const API_KEY = (typeof ENV !== 'undefined' && ENV.TMDB_API_KEY) ? ENV.TMDB_API_KEY : '';
 const BASE_URL = 'https://api.themoviedb.org/3';
 const IMAGE_URL = 'https://image.tmdb.org/t/p/w500';
 const BACKDROP_URL = 'https://image.tmdb.org/t/p/w780';

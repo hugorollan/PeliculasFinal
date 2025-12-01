@@ -111,10 +111,18 @@ PeliculasFinal/
 │
 ├── index.html          # Página principal con películas
 ├── auth.html           # Página de login y registro
+├── profile.html        # Página de perfil de usuario
 ├── styles.css          # Estilos principales
 ├── auth-styles.css     # Estilos para autenticación
+├── profile-styles.css  # Estilos para perfil
+├── layout.css          # Estilos de layout
+├── components.css      # Estilos de componentes
+├── config.js           # Configuración de la API (usa env.js)
 ├── script.js           # Lógica de películas y API TMDB
 ├── app.js              # Lógica de autenticación
+├── profile.js          # Lógica del perfil
+├── env.js.example      # Plantilla para configuración de API
+├── .env.example        # Plantilla para variables de entorno
 ├── package.json        # Dependencias y scripts
 ├── db.json             # Base de datos de usuarios (json-server)
 ├── .gitignore          # Archivos ignorados por Git
@@ -180,15 +188,32 @@ En producción, **SIEMPRE** debes:
 
 ## 🔧 Configuración de la API de TMDB
 
-El proyecto utiliza una API key de TMDB pre-configurada. Si necesitas usar tu propia API key:
+El proyecto requiere una API key de TMDB para funcionar. Sigue estos pasos para configurarla:
 
+### Paso 1: Obtener tu API Key
 1. Regístrate en [TMDB](https://www.themoviedb.org/)
-2. Obtén tu API key en tu perfil de desarrollador
-3. Reemplaza la constante `API_KEY` en `script.js`:
+2. Ve a tu perfil → Configuración → API
+3. Solicita una API key (tipo: API Read Access Token)
 
-```javascript
-const API_KEY = 'TU_API_KEY_AQUI';
-```
+### Paso 2: Configurar el archivo env.js
+1. Copia el archivo de ejemplo:
+   ```bash
+   cp env.js.example env.js
+   ```
+
+2. Abre `env.js` y reemplaza `YOUR_TMDB_API_KEY_HERE` con tu API key:
+   ```javascript
+   const ENV = {
+       TMDB_API_KEY: 'tu_api_key_aqui'
+   };
+   ```
+
+### Archivos de configuración
+- `.env.example` - Plantilla para variables de entorno (referencia)
+- `env.js.example` - Plantilla para configuración JavaScript (copia esto)
+- `env.js` - Tu configuración local (NO se sube a Git)
+
+**⚠️ Importante**: El archivo `env.js` está en `.gitignore` para proteger tu API key. Nunca subas tus credenciales al repositorio.
 
 ## 📱 Responsive Design
 
