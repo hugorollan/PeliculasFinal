@@ -38,6 +38,7 @@ temp/
 .env
 .env.local
 .env.*.local
+env.js
 
 # Package manager lock files (optional - uncomment if needed)
 # package-lock.json
